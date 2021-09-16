@@ -1,6 +1,4 @@
 #include "openapi_nlohmann_json.h"
-#include <nlohmann/json.hpp>
-
 // #include <iostream>
 
 void NlohmannJson::SetJson(std::string data)
