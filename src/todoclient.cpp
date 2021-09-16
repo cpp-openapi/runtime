@@ -3,6 +3,7 @@
 #include "request.h"
 
 #include "openapi_nlohmann_json.h"
+#include "openapi_rapidjson.h"
 #include <iostream>
 
 findTodoResponse todoservice::findTodos(findTodosParams params)
@@ -20,7 +21,8 @@ findTodoResponse todoservice::findTodos(findTodosParams params)
     result.code = respRet.GetCode();
 
     // Try convert payload
-    std::shared_ptr<Json> j = std::make_shared<NlohmannJson>();
+    // std::shared_ptr<Json> j = std::make_shared<NlohmannJson>();
+    std::shared_ptr<Json> j = std::make_shared<RapidJson>();
     j->SetJson(result.data);
 
     std::vector<std::shared_ptr<Json>> res;
@@ -30,7 +32,7 @@ findTodoResponse todoservice::findTodos(findTodosParams params)
         Item i;
         i.json_deserialize(e);
         result.payload.push_back(i);
-        std::cout <<"item: "<< i.id << " description: " << i.description << "string:" <<e->ToString()<<std::endl;
+        std::cout <<"item: "<< i.id << " description: " << i.description << " string:" <<e->ToString()<<std::endl;
     }
     //debug
     //nlohmann::json debugJ("[\"hi\"]");

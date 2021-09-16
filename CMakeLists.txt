@@ -31,6 +31,7 @@ target_include_directories(
 target_link_libraries(todo-list
   PUBLIC cpp-openapi-runtime 
   PUBLIC cpp-openapi-json-nlohmann
+  PUBLIC cpp-openapi-rapidjson
 )
 
 add_executable("beast_main" beast_main.cpp)
