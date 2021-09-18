@@ -2,8 +2,9 @@
 #include "todoclient.h"
 #include "request.h"
 
-#include "openapi_nlohmann_json.h"
-#include "openapi_rapidjson.h"
+//#include "openapi_nlohmann_json.h"
+//#include "openapi_rapidjson.h"
+#include "typefactory.h"
 #include <iostream>
 
 findTodoResponse todoservice::findTodos(findTodosParams params)
@@ -21,23 +22,22 @@ findTodoResponse todoservice::findTodos(findTodosParams params)
     result.code = respRet.GetCode();
 
     // Try convert payload
-    // std::shared_ptr<Json> j = std::make_shared<NlohmannJson>();
-    std::shared_ptr<Json> j = std::make_shared<RapidJson>();
+    std::shared_ptr<Json> j = TypeFactory::NewJson();
+    //std::shared_ptr<Json> j = std::make_shared<RapidJson>();
     j->SetJson(result.data);
 
-    std::vector<std::shared_ptr<Json>> res;
-    bool isArray = j->ToArray(res);
+    std::vector<Item> res = j->ToArray<Item>();
+    result.payload = res;
+    // std::vector<std::shared_ptr<Json>> res;
+    // bool isArray = j->ToArray(res);
     // std::cout <<"is array: "<< isArray << " debug size: "<< res.size() << std::endl;
     for (auto& e : res) {
-        Item i;
-        i.json_deserialize(e);
-        result.payload.push_back(i);
-        std::cout <<"item: "<< i.id << " description: " << i.description << " string:" <<e->ToString()<<std::endl;
+        std::cout <<"item: "<< e.id << " description: " << e.description <<std::endl;
+        //std::shared_ptr<Json> ret = std::make_shared<NlohmannJson>();
+        std::shared_ptr<Json> ret = TypeFactory::NewJson();
+        e.to_json(ret); 
+        std::cout << "deserialize: " << ret->ToString() << std::endl;
     }
-    //debug
-    //nlohmann::json debugJ("[\"hi\"]");
-    //debugJ.
-    //std::cout<<"debug is array"<< debugJ.is_array() << debugJ.is_number() << debugJ.is_string() << std::endl;
 
     return result;
 }

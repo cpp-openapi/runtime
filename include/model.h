@@ -10,6 +10,6 @@ public:
     std::string description;
     bool completed;
 
-    void to_json() const;
+    void to_json(std::shared_ptr<Json> j) const;
     void json_deserialize(std::shared_ptr<Json> j);
 };

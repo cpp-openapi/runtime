@@ -1,30 +1,49 @@
 #include "openapi_nlohmann_json.h"
 // #include <iostream>
+#include <exception>
+
+std::shared_ptr<Json>  NlohmannJson::operator[](const std::string &key)
+{
+    std::shared_ptr<NlohmannJson> j = std::make_shared<NlohmannJson>();
+
+    if (!this->HasKey(key))
+    {
+        throw new std::invalid_argument("key not found");
+    }
+
+    j->_j = this->_j.at(key);
+    return j;
+}
+
+bool NlohmannJson::HasKey(const std::string &key)
+{
+    return this->_j.contains(key);
+}
+
+int NlohmannJson::GetInt()
+{
+    if(!this->_j.is_number_integer()){
+        throw new std::invalid_argument("not integer");
+    }
+    int ret = 0;
+    this->_j.get_to<int>(ret);
+    return ret;
+}
+
+std::string NlohmannJson::GetString()
+{
+    if(!this->_j.is_string()){
+        throw new std::invalid_argument("not string");
+    }
+    std::string ret;
+    this->_j.get_to<std::string>(ret);
+    return ret;
+}
 
 void NlohmannJson::SetJson(std::string data)
 {
     
     this->_j = nlohmann::json::parse(data);
-}
-
-bool NlohmannJson::GetInt(std::string name, int &ret)
-{
-    if (!this->_j.contains(name))
-    {   
-        return false;
-    }
-    this->_j.at(name).get_to<int>(ret);
-    return true;
-}
-
-bool NlohmannJson::GetString(std::string name, std::string &ret)
-{
-    if (!this->_j.contains(name))
-    {   
-        return false;
-    }
-    this->_j.at(name).get_to<std::string>(ret);
-    return true;
 }
 
 bool NlohmannJson::GetObj(std::string name, std::shared_ptr<Json> &ret)
@@ -70,3 +89,40 @@ bool NlohmannJson::ToArray(std::vector<std::shared_ptr<Json>> &ret)
 std::string NlohmannJson::ToString(){
     return this->_j.dump();
 }
+
+bool NlohmannJson::AddMemberInt(std::string name, int val)
+{
+    this->_j[name] = val;
+    return true;
+}
+
+bool NlohmannJson::AddMemberString(std::string name, std::string val)
+{
+    this->_j[name] = val;
+    return true;
+}
+
+// obj can be array?
+bool NlohmannJson::AddMember(std::string name, std::shared_ptr<Json> val)
+{
+    std::shared_ptr<NlohmannJson> j = std::dynamic_pointer_cast<NlohmannJson>(val);
+    this->_j[name] = j->_j;
+    return true;
+}
+
+// void NlohmannJson::operator=(int val)
+// {
+//     _j = val;
+// }
+
+// void NlohmannJson::operator=(std::string val)
+// {
+//     _j = val;
+// }
+
+//  std::shared_ptr<Json> NlohmannJson::NewMember(std::string name)
+//  {
+//      std::shared_ptr<NlohmannJson> nm = std::make_shared<NlohmannJson>();
+
+//      nm->_j = _j[name];
+//  }

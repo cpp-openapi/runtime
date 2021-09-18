@@ -30,12 +30,16 @@ target_include_directories(
 
 target_link_libraries(todo-list
   PUBLIC cpp-openapi-runtime 
-  PUBLIC cpp-openapi-json-nlohmann
+  PUBLIC cpp-openapi-json-nlohmann # choose one json lib
   PUBLIC cpp-openapi-rapidjson
+  PUBLIC cpp-openapi-client-beast # choose one client lib
+  PUBLIC cpp-openapi-client-curlpp
 )
 
-add_executable("beast_main" beast_main.cpp)
-target_link_libraries("beast_main" PRIVATE ${Boost_LIBRARIES} todo-list cpp-openapi-client-beast)
-
-add_executable("curlpp_main" curlpp_main.cpp)
-target_link_libraries("curlpp_main" PRIVATE ${Boost_LIBRARIES} todo-list cpp-openapi-client-curlpp)
+add_executable("main" main.cpp)
+target_include_directories(
+  main
+  PUBLIC ${Boost_INCLUDE_DIR}
+)
+target_link_libraries("main" PRIVATE ${Boost_LIBRARIES} todo-list cpp-openapi-client-beast   
+PUBLIC pthread dl) # for stacktrace
