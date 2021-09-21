@@ -46,7 +46,7 @@ void NlohmannJson::SetJson(std::string data)
     this->_j = nlohmann::json::parse(data);
 }
 
-bool NlohmannJson::GetObj(std::string name, std::shared_ptr<Json> &ret)
+bool NlohmannJson::GetValue(std::string name, std::shared_ptr<Json> &ret)
 {
     if (!this->_j.contains(name))
     {   

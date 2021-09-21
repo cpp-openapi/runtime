@@ -46,7 +46,7 @@ void RapidJson::SetJson(std::string data)
     this->_j.Parse(data.c_str());
 }
 
-bool RapidJson::GetObj(std::string name, std::shared_ptr<Json> &ret)
+bool RapidJson::GetValue(std::string name, std::shared_ptr<Json> &ret)
 {
     if(!_j.IsObject() || !_j.HasMember(name.c_str())|| !_j[name.c_str()].IsObject())
     {

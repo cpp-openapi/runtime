@@ -14,3 +14,5 @@ target_include_directories(
 )
 
 add_subdirectory(providers)
+
+# tests are added in top dir

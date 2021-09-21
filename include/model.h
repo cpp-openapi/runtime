@@ -11,5 +11,5 @@ public:
     bool completed;
 
     void to_json(std::shared_ptr<Json> j) const;
-    void json_deserialize(std::shared_ptr<Json> j);
+    void DeserializeJSON(std::shared_ptr<Json> j);
 };

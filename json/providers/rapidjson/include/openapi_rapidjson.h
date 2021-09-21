@@ -17,7 +17,7 @@ public:
 
     std::string GetString() override;
 
-    bool GetObj(std::string name, std::shared_ptr<Json> &ret) override;
+    bool GetValue(std::string name, std::shared_ptr<Json> &ret) override;
 
     bool ToArray(std::vector<std::shared_ptr<Json>> &ret) override;
 

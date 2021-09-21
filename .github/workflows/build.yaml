@@ -22,3 +22,6 @@ jobs:
 
     - name: run build
       run: mkdir build && cd build && cmake ../ && cmake --build .
+    
+    - name: run test
+      run: cd build && ctest

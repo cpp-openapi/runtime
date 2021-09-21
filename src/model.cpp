@@ -1,6 +1,6 @@
 #include "model.h"
 
-void Item::json_deserialize(std::shared_ptr<Json> j){
+void Item::DeserializeJSON(std::shared_ptr<Json> j){
 
     if (j->HasKey("id")){
         this->id = (*j)["id"]->GetInt();
