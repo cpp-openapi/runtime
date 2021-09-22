@@ -3,6 +3,11 @@
 #include "rapidjson/stringbuffer.h"
 #include <iostream>
 
+std::shared_ptr<Json> RapidJson::New()
+{
+    return std::make_shared<RapidJson>();
+}
+
 std::shared_ptr<Json>  RapidJson::operator[](const std::string &key)
 {
     if (!this->HasKey(key))
@@ -32,6 +37,11 @@ int RapidJson::GetInt()
     return ret;
 }
 
+void RapidJson::SetInt(int val)
+{
+    this->_j.SetInt(val);
+}
+
 std::string RapidJson::GetString()
 {
     if(!this->_j.IsString()){
@@ -39,6 +49,11 @@ std::string RapidJson::GetString()
     }
     std::string ret = _j.GetString();
     return ret;
+}
+
+void RapidJson::SetString(std::string val)
+{
+    this->_j.SetString(val.c_str(),val.size(),_j.GetAllocator());
 }
 
 void RapidJson::SetJson(std::string data)
@@ -75,6 +90,17 @@ bool RapidJson::ToArray(std::vector<std::shared_ptr<Json>> &ret)
         ret.push_back(e);
     }
     return true;
+}
+
+// TODO: implement this
+void RapidJson::FlattenFrom(std::vector<std::shared_ptr<Json>> arr)
+{
+    std::shared_ptr<RapidJson> ret = std::make_shared<RapidJson>();
+    // for (const std::shared_ptr<Json> & j : arr)
+    // {
+    //     std::shared_ptr<NlohmannJson> jj = std::dynamic_pointer_cast<NlohmannJson>(j);
+    //     ret->_j.push_back(jj->_j);
+    // }
 }
 
 std::string RapidJson::ToString(){

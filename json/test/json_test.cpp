@@ -40,6 +40,12 @@ struct Address
         this->state = Json::GetMember<std::string>(j, "state");
         this->city = Json::GetMember<std::string>(j, "city");
     }
+
+    void SerializeJSON(std::shared_ptr<Json> j)
+    {
+        Json::AddMember<std::string>(j, "state", this->state);
+        Json::AddMember<std::string>(j, "city", this->city);
+    }
 };
 
 struct Company
@@ -51,6 +57,12 @@ struct Company
         this->name = Json::GetMember<std::string>(j, "name");
         this->location = Json::GetMember<std::shared_ptr<Address>>(j, "location");
     }
+
+    void SerializeJSON(std::shared_ptr<Json> j)
+    {
+        Json::AddMember<std::string>(j, "name", this->name);
+        Json::AddMember<std::shared_ptr<Address>>(j, "location", this->location);
+    }
 };
 
 struct Order
@@ -59,6 +71,10 @@ struct Order
     void DeserializeJSON(std::shared_ptr<Json> j)
     {
         this->id = Json::GetMember<int>(j, "id");
+    }
+    void SerializeJSON(std::shared_ptr<Json> j)
+    {
+        Json::AddMember<int>(j, "id", this->id);
     }
 };
 
@@ -84,6 +100,18 @@ struct Person
 
         // ptr array
         this->orders = Json::GetMember<std::vector<std::shared_ptr<Order>>>(j, "orders");
+    }
+
+    void SerializeJSON(std::shared_ptr<Json> j)
+    {
+        Json::AddMember<std::string>(j, "name", this->name);
+        Json::AddMember<int>(j, "age", this->age);
+        Json::AddMember<std::vector<Address>>(j, "address", this->address);
+        Json::AddMember<Company>(j, "company", this->company);
+
+        Json::AddMember<std::vector<int>>(j, "project_ids", this->project_ids);
+        Json::AddMember<std::vector<std::string>>(j, "project_names", this->project_names);
+        Json::AddMember<std::vector<std::shared_ptr<Order>>>(j, "orders", this->orders);
     }
 };
 
@@ -149,4 +177,66 @@ TEST(Json, rapidjson)
     std::shared_ptr<Json> j = std::make_shared<RapidJson>();
     j->SetJson(personJson);
     testJsonImpl(j);
+}
+
+TEST(Json, nolhmannjson_serialize)
+{
+    Person p;
+    p.name = "John";
+    p.age = 10;
+    p.address = {
+        {"CA","Los Angeles"},
+        {"WA", "Seattle"}
+    };
+
+//     "name" : "Costco",
+//     "location" : {
+//         "state" : "OR",
+//         "city" : "Portland"
+//     }
+    p.company.name = "Costco";
+    p.company.location = std::make_shared<Address>();
+    p.company.location->state = "OR";
+    p.company.location->city = "Portland";
+
+//  "project_ids" : [1,2,3],
+//  "project_names" : ["project1","project2"],
+    p.project_ids = {1,2,3};
+    p.project_names = {"project1","project2"};
+
+// "orders" : [{"id":11},{"id":12}]
+    p.orders = {std::make_shared<Order>(), std::make_shared<Order>()};
+    p.orders[0]->id = 11;
+    p.orders[1]->id = 12;
+
+    std::shared_ptr<NlohmannJson> j = std::make_shared<NlohmannJson>();
+    p.SerializeJSON(j);
+
+    ASSERT_EQ(p.name, Json::GetMember<std::string>(j, "name"));
+    ASSERT_EQ(p.age, Json::GetMember<int>(j, "age"));
+
+    // address
+    std::vector<Address> &addressExpect = p.address;
+    std::vector<Address> addressResult = Json::GetMember<std::vector<Address>>(j, "address");
+    ASSERT_EQ(addressExpect.size(), addressResult.size());
+    ASSERT_EQ(addressExpect[0].state, addressResult[0].state);
+    ASSERT_EQ(addressExpect[0].city, addressResult[0].city);
+    ASSERT_EQ(addressExpect[1].state, addressResult[1].state);
+    ASSERT_EQ(addressExpect[0].city, addressResult[0].city);
+
+    // company
+    Company companyExpected = p.company;
+    Company companyResult = Json::GetMember<Company>(j, "company");
+    ASSERT_EQ(companyExpected.name, companyResult.name);
+
+    // array
+    ASSERT_EQ(p.project_ids, Json::GetMember<std::vector<int>>(j, "project_ids"));
+    ASSERT_EQ(p.project_names, Json::GetMember<std::vector<std::string>>(j, "project_names"));
+
+    // orders
+    std::vector<std::shared_ptr<Order>> & orderExpected = p.orders;
+    std::vector<std::shared_ptr<Order>> ordersResult =  Json::GetMember<std::vector<std::shared_ptr<Order>>>(j, "orders");
+    ASSERT_EQ(orderExpected.size(), ordersResult.size());
+    ASSERT_EQ(orderExpected[0]->id, ordersResult[0]->id);
+    ASSERT_EQ(orderExpected[1]->id, ordersResult[1]->id);
 }

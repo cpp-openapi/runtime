@@ -6,6 +6,8 @@ class RapidJson : public Json
 {
 public:
     RapidJson() = default;
+
+    std::shared_ptr<Json> New() override;
 //    RapidJson(rapidjson::Document d);
     void SetJson(std::string data) override;
 
@@ -15,11 +17,17 @@ public:
 
     int GetInt() override;
 
+    void SetInt(int val) override;
+
     std::string GetString() override;
+
+    void SetString(std::string val) override;
 
     bool GetValue(std::string name, std::shared_ptr<Json> &ret) override;
 
     bool ToArray(std::vector<std::shared_ptr<Json>> &ret) override;
+
+    void FlattenFrom(std::vector<std::shared_ptr<Json>> arr) override;
 
     std::string ToString() override;
 

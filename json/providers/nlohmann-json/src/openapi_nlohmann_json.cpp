@@ -2,6 +2,11 @@
 // #include <iostream>
 #include <exception>
 
+std::shared_ptr<Json> NlohmannJson::New()
+{
+    return std::make_shared<NlohmannJson>();
+}
+
 std::shared_ptr<Json>  NlohmannJson::operator[](const std::string &key)
 {
     std::shared_ptr<NlohmannJson> j = std::make_shared<NlohmannJson>();
@@ -30,6 +35,11 @@ int NlohmannJson::GetInt()
     return ret;
 }
 
+void NlohmannJson::SetInt(int val)
+{
+    this->_j = val;
+}
+
 std::string NlohmannJson::GetString()
 {
     if(!this->_j.is_string()){
@@ -38,6 +48,11 @@ std::string NlohmannJson::GetString()
     std::string ret;
     this->_j.get_to<std::string>(ret);
     return ret;
+}
+
+void NlohmannJson::SetString(std::string val)
+{
+    this->_j = val;
 }
 
 void NlohmannJson::SetJson(std::string data)
@@ -84,6 +99,15 @@ bool NlohmannJson::ToArray(std::vector<std::shared_ptr<Json>> &ret)
     }
     ret = res;
     return true;
+}
+
+void NlohmannJson::FlattenFrom(std::vector<std::shared_ptr<Json>> arr)
+{
+    for (const std::shared_ptr<Json> & j : arr)
+    {
+        std::shared_ptr<NlohmannJson> jj = std::dynamic_pointer_cast<NlohmannJson>(j);
+        this->_j.push_back(jj->_j);
+    }
 }
 
 std::string NlohmannJson::ToString(){

@@ -9,6 +9,8 @@
 class Json
 {
 public:
+    // returns a empty json of the same impl type
+    virtual std::shared_ptr<Json> New() = 0;
     // sets the json content
     virtual void SetJson(std::string data) = 0;
 
@@ -17,12 +19,19 @@ public:
     virtual std::shared_ptr<Json> operator[](const std::string &key) = 0;
 
     virtual int GetInt() = 0;
+    
+    virtual void SetInt(int val) = 0;
 
     virtual std::string GetString() = 0;
+
+    virtual void SetString(std::string val) = 0;
 
     virtual bool GetValue(std::string name, std::shared_ptr<Json> &ret) = 0;
 
     virtual bool ToArray(std::vector<std::shared_ptr<Json>> &ret) = 0;
+
+    // make json array
+    virtual void FlattenFrom(std::vector<std::shared_ptr<Json>> arr) = 0;
 
     virtual std::string ToString() = 0;
 
@@ -110,6 +119,82 @@ public:
             return value->ToArray<V>();
         }else{
             return Json::Get<T>(value);
+        }
+    }
+
+    // copy val into j
+    template<typename T>
+    static void ToJson(std::shared_ptr<Json> j, T val){
+        if constexpr (std::is_same<T, int>::value)
+        {
+            j->SetInt(val);
+        }
+        else if constexpr (std::is_same<T, std::string>::value)
+        {
+            j->SetString(val);
+        }
+        else if constexpr (is_vector<T>::value)
+        {
+            Json::ToJsonArray(j, val);
+        }
+        else
+        {
+            // structs
+            if constexpr (is_shared_ptr<T>::value == true)
+            {
+                val->SerializeJSON(j);
+            }
+            else
+            {
+                val.SerializeJSON(j);
+            }
+        }
+    }
+
+    // copy arr in to j
+    template<typename T>
+    static void ToJsonArray(std::shared_ptr<Json> j, std::vector<T> arr)
+    {
+        std::vector<std::shared_ptr<Json>> ret;
+        // TODO set int etc
+        for(const T e : arr)
+        {
+            std::shared_ptr<Json> je = j->New();
+            Json::ToJson(je, e);
+            ret.push_back(je);
+        }
+        j->FlattenFrom(ret);
+    }
+
+    template<typename T>
+    static void AddMember(std::shared_ptr<Json> j, std::string key, T val)
+    {
+        if constexpr (std::is_same<T, int>::value)
+        {
+            j->AddMemberInt(key,val);
+        }
+        else if constexpr (std::is_same<T, std::string>::value)
+        {
+            j->AddMemberString(key,val);
+        }
+        else if constexpr (is_vector<T>::value)
+        {
+            std::shared_ptr<Json> jVal = j->New();
+            Json::ToJson(jVal, val);
+            j->AddMember(key, jVal);
+        }
+        else
+        {
+            std::shared_ptr<Json> jVal = j->New();
+            if constexpr (is_shared_ptr<T>::value == true)
+            {
+                val->SerializeJSON(jVal);
+            }
+            else
+            {
+                val.SerializeJSON(jVal);
+            }
+            j->AddMember(key, jVal);
         }
     }
 };
