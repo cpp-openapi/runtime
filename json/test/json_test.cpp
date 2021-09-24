@@ -179,9 +179,10 @@ TEST(Json, rapidjson)
     testJsonImpl(j);
 }
 
-TEST(Json, nolhmannjson_serialize)
+
+void testJsonSerialize(std::shared_ptr<Json> j)
 {
-    Person p;
+   Person p;
     p.name = "John";
     p.age = 10;
     p.address = {
@@ -209,7 +210,7 @@ TEST(Json, nolhmannjson_serialize)
     p.orders[0]->id = 11;
     p.orders[1]->id = 12;
 
-    std::shared_ptr<NlohmannJson> j = std::make_shared<NlohmannJson>();
+
     p.SerializeJSON(j);
 
     ASSERT_EQ(p.name, Json::GetMember<std::string>(j, "name"));
@@ -239,4 +240,48 @@ TEST(Json, nolhmannjson_serialize)
     ASSERT_EQ(orderExpected.size(), ordersResult.size());
     ASSERT_EQ(orderExpected[0]->id, ordersResult[0]->id);
     ASSERT_EQ(orderExpected[1]->id, ordersResult[1]->id);
+}
+
+// TEST(Json, nolhmannjson_serialize)
+// {
+//     std::shared_ptr<NlohmannJson> j = std::make_shared<NlohmannJson>();
+//     testJsonSerialize(j);
+// }
+
+TEST(Json, rapidjson_serialize)
+{
+    std::shared_ptr<RapidJson> j = std::make_shared<RapidJson>();  
+    testJsonSerialize(j);
+}
+
+TEST(Json, nolhmannjson_serialize_deserialize_identity)
+{
+    std::shared_ptr<Json> j = std::make_shared<NlohmannJson>();
+    j->SetJson(personJson);
+    Person p;
+    p.DeserializeJSON(j);
+
+    std::shared_ptr<Json> j2 = std::make_shared<NlohmannJson>();
+    p.SerializeJSON(j2);
+
+    nlohmann::json jExpect = nlohmann::json::parse(personJson);
+    nlohmann::json jResult = nlohmann::json::parse(j2->ToString());
+    ASSERT_TRUE(jExpect == jResult);
+}
+
+TEST(Json, rapidjson_serialize_deserialize_identity)
+{
+    std::shared_ptr<Json> j = std::make_shared<RapidJson>();
+    j->SetJson(personJson);
+    Person p;
+    p.DeserializeJSON(j);
+
+    std::shared_ptr<Json> j2 = std::make_shared<RapidJson>();
+    p.SerializeJSON(j2);
+
+    rapidjson::Document jExpect;
+    jExpect.Parse(personJson);
+    rapidjson::Document jResult;
+    jResult.Parse(j2->ToString().c_str());
+    ASSERT_TRUE(jExpect == jResult);
 }

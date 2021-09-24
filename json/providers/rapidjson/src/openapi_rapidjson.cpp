@@ -16,10 +16,11 @@ std::shared_ptr<Json>  RapidJson::operator[](const std::string &key)
     }
 
     rapidjson::Value const &v = _j[key.c_str()];
-    rapidjson::Value copy(v,_j.GetAllocator());
+    rapidjson::Value copy;
+    copy.CopyFrom(v,_j.GetAllocator());
     // todo optimize
     std::shared_ptr<RapidJson> j = std::make_shared<RapidJson>();
-    j->_j.Swap(copy);
+    j->_j.CopyFrom(copy.Move(),j->_j.GetAllocator());
     return j;
 }
 
@@ -68,10 +69,10 @@ bool RapidJson::GetValue(std::string name, std::shared_ptr<Json> &ret)
         return false;
     }
     rapidjson::Value const &v = _j[name.c_str()];
-    rapidjson::Value copy(v,_j.GetAllocator());
+    //rapidjson::Value copy(v,_j.GetAllocator());
     // todo optimize
     std::shared_ptr<RapidJson> j = std::make_shared<RapidJson>();
-    j->_j.Swap(copy);
+    j->_j.CopyFrom(v, j->_j.GetAllocator());
     return true;
 }
 
@@ -84,8 +85,9 @@ bool RapidJson::ToArray(std::vector<std::shared_ptr<Json>> &ret)
     for (rapidjson::Value::ConstValueIterator itr = _j.Begin(); itr != _j.End(); ++itr)
     {
         rapidjson::Value const &v = *itr;
-        rapidjson::Value copy(v,_j.GetAllocator());
+        // rapidjson::Value copy(v,_j.GetAllocator());
         std::shared_ptr<RapidJson> e = std::make_shared<RapidJson>();
+        rapidjson::Value copy(v, this->_j.GetAllocator());
         e->_j.Swap(copy);
         ret.push_back(e);
     }
@@ -95,12 +97,13 @@ bool RapidJson::ToArray(std::vector<std::shared_ptr<Json>> &ret)
 // TODO: implement this
 void RapidJson::FlattenFrom(std::vector<std::shared_ptr<Json>> arr)
 {
-    std::shared_ptr<RapidJson> ret = std::make_shared<RapidJson>();
-    // for (const std::shared_ptr<Json> & j : arr)
-    // {
-    //     std::shared_ptr<NlohmannJson> jj = std::dynamic_pointer_cast<NlohmannJson>(j);
-    //     ret->_j.push_back(jj->_j);
-    // }
+    this->_j.SetArray();
+    for (const std::shared_ptr<Json> & j : arr)
+    {
+        std::shared_ptr<RapidJson> jj = std::dynamic_pointer_cast<RapidJson>(j);
+        rapidjson::Value copy(jj->_j, this->_j.GetAllocator());
+        this->_j.PushBack(copy,this->_j.GetAllocator());
+    }
 }
 
 std::string RapidJson::ToString(){
@@ -128,7 +131,7 @@ bool RapidJson::AddMemberInt(std::string name, int val)
     //kvs.SetObject();
     rapidjson::Value key;
     key.SetString(name.c_str(),name.size(),_j.GetAllocator());
-    _j.AddMember(key, val, _j.GetAllocator());
+    _j.AddMember(key.Move(), val, _j.GetAllocator());
     return true;
 }
 
@@ -142,23 +145,17 @@ bool RapidJson::AddMemberString(std::string name, std::string val)
     key.SetString(name.c_str(),name.size(),_j.GetAllocator());
     rapidjson::Value v;
     v.SetString(val.c_str(),val.size(),_j.GetAllocator());
-    _j.AddMember(key, v, _j.GetAllocator());
+    _j.AddMember(key.Move(), v.Move(), _j.GetAllocator());
     return true;
 }
 
 bool RapidJson::AddMember(std::string name, std::shared_ptr<Json> val)
 {
-    // TODO fix this
-    rapidjson::Value kvs;
     rapidjson::Value key;
     key.SetString(name.c_str(),name.size(),_j.GetAllocator());
 
     std::shared_ptr<RapidJson> j = std::dynamic_pointer_cast<RapidJson>(val);
-    
-    if(j->_j.IsObject() || j->_j.IsArray()){
-        kvs.AddMember(key, j->_j, _j.GetAllocator());
-    }
-
+    rapidjson::Value copy(j->_j, _j.GetAllocator());
+    _j.AddMember(key.Move(), copy.Move(), _j.GetAllocator());
     return true;
-    //kvs.AddMember(key, val, _j.GetAllocator());
 }
