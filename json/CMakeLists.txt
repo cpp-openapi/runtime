@@ -5,7 +5,7 @@ file(GLOB SOURCES
 
 project(cpp-openapi-json)
 
-add_library(cpp-openapi-json "${cxx_strict}"
+add_library(cpp-openapi-json STATIC "${cxx_strict}"
 ${SOURCES})
 
 target_include_directories(

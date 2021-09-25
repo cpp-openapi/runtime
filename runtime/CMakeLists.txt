@@ -9,8 +9,9 @@ file(GLOB SOURCES
     src/*.cpp
 )
 
-add_library(cpp-openapi-runtime "${cxx_strict}" 
-${SOURCES})
+add_library(cpp-openapi-runtime STATIC "${cxx_strict}" 
+    ${SOURCES}
+)
 
 target_include_directories(
     cpp-openapi-runtime

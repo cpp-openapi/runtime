@@ -17,11 +17,21 @@ jobs:
     - name: Get boost
       run: sudo apt-get install libboost-all-dev
 
-    - name: Get curl etc
-      run: sudo apt-get install libssl-dev libcurl4-openssl-dev
+    # curl is built from source now. No need to have these libs
+    # - name: Get curl etc
+    #   run: sudo apt-get install libssl-dev libcurl4-openssl-dev
+    
+    - name: run cmake
+      run: mkdir build && cd build && cmake ../
 
     - name: run build
-      run: mkdir build && cd build && cmake ../ && cmake --build .
+      run: cd build && cmake --build .
     
     - name: run test
       run: cd build && ctest
+
+    - name: get valgrind
+      run: sudo apt-get install valgrind
+
+    - name: check test memory corruption
+      run: cd build && valgrind ./json/test/json_test

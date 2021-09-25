@@ -20,7 +20,7 @@ file(GLOB SOURCES
 
 project(cpp-openapi-json-nlohmann)
 
-add_library(cpp-openapi-json-nlohmann SHARED "${cxx_strict}" 
+add_library(cpp-openapi-json-nlohmann STATIC "${cxx_strict}" 
 ${SOURCES})
 
 target_include_directories(

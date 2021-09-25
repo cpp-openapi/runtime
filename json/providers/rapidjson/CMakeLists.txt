@@ -18,7 +18,7 @@ file(GLOB SOURCES
 
 project(cpp-openapi-rapidjson)
 
-add_library(cpp-openapi-rapidjson "${cxx_strict}" 
+add_library(cpp-openapi-rapidjson STATIC "${cxx_strict}" 
 ${SOURCES})
 
 target_include_directories(

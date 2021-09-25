@@ -21,7 +21,7 @@ file(GLOB SOURCES
     src/*.cpp
 )
 
-add_library(todo-list "${cxx_strict}" ${SOURCES})
+add_library(todo-list STATIC "${cxx_strict}" ${SOURCES})
 
 target_include_directories(
     todo-list

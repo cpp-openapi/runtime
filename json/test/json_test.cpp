@@ -242,11 +242,11 @@ void testJsonSerialize(std::shared_ptr<Json> j)
     ASSERT_EQ(orderExpected[1]->id, ordersResult[1]->id);
 }
 
-// TEST(Json, nolhmannjson_serialize)
-// {
-//     std::shared_ptr<NlohmannJson> j = std::make_shared<NlohmannJson>();
-//     testJsonSerialize(j);
-// }
+TEST(Json, nolhmannjson_serialize)
+{
+    std::shared_ptr<NlohmannJson> j = std::make_shared<NlohmannJson>();
+    testJsonSerialize(j);
+}
 
 TEST(Json, rapidjson_serialize)
 {
