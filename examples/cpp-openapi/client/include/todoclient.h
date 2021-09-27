@@ -4,20 +4,9 @@
 #include <string>
 #include <memory>
 #include "client.h"
-#include "model.h"
-
-struct findTodosParams
-{
-    int limit;
-    int since;
-};
-
-struct findTodoResponse
-{
-    std::string data;
-    int code;
-    std::vector<Item> payload;
-};
+#include "find_todo.h"
+#include "add_one.h"
+#include "destroy_one.h"
 
 // defines api tag methods
 class todoservice
@@ -25,7 +14,9 @@ class todoservice
 public:
     todoservice(std::shared_ptr<IClient> cli):_cli(cli) {};
     std::shared_ptr<IClient> _cli;
-    findTodoResponse findTodos(findTodosParams params);
+    FindTodoResponse FindTodos(FindTodosParams params);
+    AddOneResponse AddOne(AddOneParams params);
+    DestroyOneResponse DestroyOne(DestroyOneParams params);
 };
 
 // class todoclient

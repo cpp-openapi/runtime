@@ -103,6 +103,7 @@ bool NlohmannJson::ToArray(std::vector<std::shared_ptr<Json>> &ret)
 
 void NlohmannJson::FlattenFrom(std::vector<std::shared_ptr<Json>> arr)
 {
+    this->_j = nlohmann::json::array();
     for (const std::shared_ptr<Json> & j : arr)
     {
         std::shared_ptr<NlohmannJson> jj = std::dynamic_pointer_cast<NlohmannJson>(j);

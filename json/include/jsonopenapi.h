@@ -94,6 +94,11 @@ public:
         {
             i = j->GetString();
         }
+        else if constexpr(is_vector<T>::value)
+        {
+            using V = typename T::value_type;
+            i = j->ToArray<V>();
+        }
         else
         {
             // TODO: use declare type in c++17 or requires in c++20
@@ -113,13 +118,7 @@ public:
     static T GetMember(std::shared_ptr<Json> j, std::string key)
     {
         std::shared_ptr<Json> value = (*j)[key];
-        if constexpr(is_vector<T>::value)
-        {
-            using V = typename T::value_type;
-            return value->ToArray<V>();
-        }else{
-            return Json::Get<T>(value);
-        }
+        return Json::Get<T>(value);
     }
 
     // copy val into j

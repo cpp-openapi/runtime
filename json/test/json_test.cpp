@@ -267,6 +267,8 @@ TEST(Json, nolhmannjson_serialize_deserialize_identity)
     nlohmann::json jExpect = nlohmann::json::parse(personJson);
     nlohmann::json jResult = nlohmann::json::parse(j2->ToString());
     ASSERT_TRUE(jExpect == jResult);
+
+    //std::cout << "debug" << j2->ToString() << std::endl;
 }
 
 TEST(Json, rapidjson_serialize_deserialize_identity)

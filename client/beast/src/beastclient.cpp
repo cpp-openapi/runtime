@@ -27,11 +27,26 @@ void BeastClient::MakeRequest(const IOASClientRequest &req, IOASClientResponse &
         // Make the connection on the IP address we get from a lookup
         stream.connect(results);
 
-        std::string temppath = this->_cfg.BasePath + req.GetPath();
+        std::string url = this->_cfg.BasePath + req.GetPath();
+
+        // needs to be built manually
+        const Values &q = req.GetQueryParam();
+        if (q.size() != 0){
+            url += "?";
+            for (auto const &[key, val] : q)
+            {
+                // use the first val. TODO: fix this
+                if (val.size() == 0)
+                {
+                    continue;
+                }
+                url += (key + "=" + val[0]);
+            }
+        }
 
         // Set up an HTTP GET request message
         http::verb method = http::string_to_verb(req.GetMethod());
-        http::request<http::string_body> bReq{method, temppath, 11};
+        http::request<http::string_body> bReq{method, url, 11};
         bReq.set(http::field::host, this->_cfg.Host);
         bReq.set(http::field::user_agent, BOOST_BEAST_VERSION_STRING);
 
@@ -46,6 +61,8 @@ void BeastClient::MakeRequest(const IOASClientRequest &req, IOASClientResponse &
           }
           bReq.set(key, val[0]);
         }
+        bReq.body() = req.GetBody();
+        bReq.prepare_payload();
 
         // Send the HTTP request to the remote host
         http::write(stream, bReq);
@@ -83,5 +100,5 @@ void BeastClient::MakeRequest(const IOASClientRequest &req, IOASClientResponse &
         // If we get here then the connection is closed gracefully
 
         // TODO: response
-        // std::cout <<"debug resp:"<< beast::buffers_to_string(res.body().data()) << std::endl;
+        //std::cout <<"debug resp:"<< beast::buffers_to_string(res.body().data()) << std::endl;
 }

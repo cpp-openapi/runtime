@@ -5,7 +5,7 @@ file(GLOB SOURCES
 
 project(cpp-openapi-client-beast)
 
-add_library(cpp-openapi-client-beast "${cxx_strict}" 
+add_library(cpp-openapi-client-beast STATIC "${cxx_strict}" 
 # ${Boost_LIBRARIES} 
 ${SOURCES})
 
