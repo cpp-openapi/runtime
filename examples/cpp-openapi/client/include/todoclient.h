@@ -4,9 +4,15 @@
 #include <string>
 #include <memory>
 #include "client.h"
-#include "find_todo.h"
-#include "add_one.h"
-#include "destroy_one.h"
+
+#include "add_one_params.h"
+#include "add_one_response.h"
+
+#include "find_todo_params.h"
+#include "find_todo_response.h"
+
+#include "destroy_one_params.h"
+#include "destroy_one_response.h"
 
 // defines api tag methods
 class todoservice

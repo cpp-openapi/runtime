@@ -1,18 +1,9 @@
 #pragma once
-
 #include <string>
 #include <vector>
 #include "item.h"
 #include <iostream>
 #include <optional>
-#include "request.h"
-
-struct FindTodosParams
-{
-    std::optional<int> limit;
-    std::optional<int> since;
-    void WriteParams(std::shared_ptr<IOASClientRequest> req);
-};
 
 struct FindTodoResponse
 {
