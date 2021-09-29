@@ -35,3 +35,45 @@ jobs:
 
     - name: check test memory corruption
       run: cd build && valgrind ./json/test/json_test
+
+    - name: Save main exe
+      uses: actions/upload-artifact@v2
+      with:
+        name: main-exe
+        path: build/examples/cpp-openapi/main
+        retention-days: 1
+      
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      #- uses: actions/checkout@v2
+
+      - name: download main executable
+        uses: actions/download-artifact@master
+        with:
+          name: main-exe
+          path: build/examples/cpp-openapi
+      
+      - name: make artifact executable
+        run: sudo chmod +x ./build/examples/cpp-openapi/main
+
+      # run go-swagger example server
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.2
+
+      - name: Get go-swagger repo
+        run: git clone --depth 1 https://github.com/go-swagger/go-swagger.git
+    
+      - name: build server
+        run: cd go-swagger && go build -o ../server examples/auto-configure/cmd/a-to-do-list-application-server/main.go
+      
+      - name: run server
+        run: ./server --port=12345 &
+
+      - name: run main exe
+        run: ./build/examples/cpp-openapi/main
+      

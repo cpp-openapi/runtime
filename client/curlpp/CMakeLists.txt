@@ -15,6 +15,8 @@ set(CMAKE_USE_LIBSSH2 off CACHE BOOL "" FORCE)
 set(CMAKE_USE_LIBSSH  off CACHE BOOL "" FORCE)
 set(CURL_CA_PATH "none" CACHE STRING "" FORCE)
 set(BUILD_TESTING off CACHE BOOL "" FORCE)
+# use static curl lib
+set(BUILD_SHARED_LIBS off CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(CURL)
 
 # Populate vars for cmake find CURL module
@@ -28,6 +30,7 @@ FetchContent_Declare(
     GIT_REPOSITORY https://github.com/jpbarrette/curlpp.git
     GIT_TAG a67c73dde2c5d50b3dd3f898b8c185c23de827f3 # latest
 )
+set(CURLPP_BUILD_SHARED_LIBS off CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(curlpp)
 
 file(GLOB SOURCES
@@ -37,7 +40,7 @@ file(GLOB SOURCES
 
 project(cpp-openapi-client-curlpp)
 
-add_library(cpp-openapi-client-curlpp "${cxx_strict}" 
+add_library(cpp-openapi-client-curlpp STATIC "${cxx_strict}" 
 ${SOURCES})
 
 target_include_directories(
@@ -47,4 +50,4 @@ target_include_directories(
     "${curlpp_SOURCE_DIR}/include"
 )
 
-target_link_libraries(cpp-openapi-client-curlpp PRIVATE ${Boost_LIBRARIES} cpp-openapi-runtime curlpp)
+target_link_libraries(cpp-openapi-client-curlpp PRIVATE ${Boost_LIBRARIES} cpp-openapi-runtime curlpp_static)
