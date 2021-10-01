@@ -4,13 +4,13 @@
 #include "item.h"
 #include <iostream>
 #include <optional>
+#include "response.h"
 
 struct FindTodoResponse
 {
-    std::string data;
-    int code;
+    // std::string data;
+    int Code;
     std::optional<std::vector<Item>> Payload;
-    void SetPayload(std::shared_ptr<Json> j);
-    void SetPayload(std::string data);
+    void ReadResponse(std::shared_ptr<IOASClientResponse> resp);
     friend std::ostream& operator<<(std::ostream& os, const FindTodoResponse& resp);
 };

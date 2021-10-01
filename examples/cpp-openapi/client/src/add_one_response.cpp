@@ -2,26 +2,14 @@
 #include "typefactory.h"
 #include <string>
 #include <iostream>
+#include "todo_response_common.h"
+#include "todo_stream.h"
 
-void AddOneResponse::SetPayload(std::shared_ptr<Json> j)
+void AddOneResponse::ReadResponse(std::shared_ptr<IOASClientResponse> resp)
 {
-    this->Payload = Json::Get<Item>(j);
-}
-void AddOneResponse::SetPayload(std::string data){
-    if (data.size() == 0){
-        return;
-    }
-    std::shared_ptr<Json> j = TypeFactory::NewJson();
-    j->SetJson(data);
-    this->SetPayload(j);
+    ReadResponseCommon<AddOneResponse>(*this, resp);
 }
 
 std::ostream& operator<<(std::ostream& os, const AddOneResponse& resp){
-    std::shared_ptr<Json> j = TypeFactory::NewJson();
-    if(resp.Payload.has_value())
-    {
-        Json::ToJson(j, resp.Payload.value());
-    }
-    os << "[" << resp.Code << "]: " << j->ToString();
-    return os;
+    return WriteResponseToStream(os, resp);
 }

@@ -11,5 +11,5 @@ struct DestroyOneParams
 
     // path param
     std::optional<int> id;
-    void WriteParams(std::shared_ptr<IOASClientRequest> req);
+    void WriteParams(std::shared_ptr<IOASClientRequest> req) const;
 };

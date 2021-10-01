@@ -10,5 +10,6 @@ target_include_directories(
   PUBLIC ${Boost_INCLUDE_DIR}
 )
 target_link_libraries("main" PRIVATE todo-list-client
+PUBLIC cpp-openapi-runtime # for auth
 PUBLIC pthread dl
 PUBLIC ${Boost_LIBRARIES}) # for stacktrace

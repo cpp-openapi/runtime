@@ -3,26 +3,14 @@
 #include "typefactory.h"
 #include <iostream>
 
+#include "todo_response_common.h"
+#include "todo_stream.h"
 
 void DestroyOneResponse::ReadResponse(std::shared_ptr<IOASClientResponse> resp)
 {
-    this->Code = resp->GetCode();
-
-    std::string body = resp->GetBody();
-    if (body.size() == 0){
-        return;
-    }
-    std::shared_ptr<Json> j = TypeFactory::NewJson();
-    j->SetJson(body);    
-    this->Payload = Json::Get<Error>(j);
+    ReadResponseCommon<DestroyOneResponse>(*this, resp);
 }
 
 std::ostream& operator<<(std::ostream& os, const DestroyOneResponse& resp){
-    std::shared_ptr<Json> j = TypeFactory::NewJson();
-    if(resp.Payload.has_value())
-    {
-        Json::ToJson(j, resp.Payload.value());
-    }
-    os << "[" << resp.Code << "]: " << j->ToString();
-    return os;
+    return WriteResponseToStream(os, resp);
 }

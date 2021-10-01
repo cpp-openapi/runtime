@@ -1,27 +1,13 @@
 #include "find_todo_response.h"
 #include "typefactory.h"
+#include "todo_response_common.h"
+#include "todo_stream.h"
 
-void FindTodoResponse::SetPayload(std::shared_ptr<Json> j)
+void FindTodoResponse::ReadResponse(std::shared_ptr<IOASClientResponse> resp)
 {
-    this->Payload = Json::Get<std::vector<Item>>(j);
-}
-
-void FindTodoResponse::SetPayload(std::string data)
-{
-    if (data.size() == 0){
-        return;
-    }
-    std::shared_ptr<Json> j = TypeFactory::NewJson();
-    j->SetJson(data);
-    this->SetPayload(j);
+    ReadResponseCommon<FindTodoResponse>(*this, resp);
 }
 
 std::ostream& operator<<(std::ostream& os, const FindTodoResponse& resp){
-    std::shared_ptr<Json> j = TypeFactory::NewJson();
-    if(resp.Payload.has_value())
-    {
-        Json::ToJson(j, resp.Payload.value());
-    }
-    os << "[" << resp.code << "]: " << j->ToString();
-    return os;
+    return WriteResponseToStream(os, resp);
 }

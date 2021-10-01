@@ -2,13 +2,13 @@
 
 #include "item.h"
 #include <optional>
+#include "response.h"
 
 
 struct AddOneResponse
 {
     std::optional<Item> Payload;
     int Code;
-    void SetPayload(std::shared_ptr<Json> j);
-    void SetPayload(std::string data);
+    void ReadResponse(std::shared_ptr<IOASClientResponse> resp);
     friend std::ostream& operator<<(std::ostream& os, const AddOneResponse& resp);
 };

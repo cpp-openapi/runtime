@@ -2,6 +2,7 @@
 #include "typefactory.h"
 #include <iostream>
 #include <boost/stacktrace.hpp>
+#include "auth.h"
 
 int main()
 {
@@ -16,6 +17,7 @@ int main()
         std::shared_ptr<IClient> cli =  TypeFactory::NewClient(cfg);
 
         todoservice ts(cli);
+        ts.SetDefaultAuth(APIAuth("x-todolist-token", "example token"));
         {
             FindTodosParams p;
             // p.limit = 3;

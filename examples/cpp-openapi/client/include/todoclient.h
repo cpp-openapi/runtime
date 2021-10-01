@@ -13,6 +13,7 @@
 
 #include "destroy_one_params.h"
 #include "destroy_one_response.h"
+#include "auth.h"
 
 // defines api tag methods
 class todoservice
@@ -20,6 +21,8 @@ class todoservice
 public:
     todoservice(std::shared_ptr<IClient> cli):_cli(cli) {};
     std::shared_ptr<IClient> _cli;
+    AuthInfoWriter _auth = nullptr;
+    void SetDefaultAuth(AuthInfoWriter auth);
     FindTodoResponse FindTodos(FindTodosParams params);
     AddOneResponse AddOne(AddOneParams params);
     DestroyOneResponse DestroyOne(DestroyOneParams params);

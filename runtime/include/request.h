@@ -103,8 +103,8 @@ public:
 };
 
 // generated param needs to implement this
-class IClientRequestWriter
-{
-public:
-    virtual void WriteToClientRequest(IOASClientRequest *req);
-};
+// class IClientRequestWriter
+// {
+// public:
+//     virtual void WriteToClientRequest(std::shared_ptr<IOASClientRequest> req);
+// };

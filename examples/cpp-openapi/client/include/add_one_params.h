@@ -6,6 +6,10 @@
 
 struct AddOneParams
 {
+    static std::string const ContentType;
+    static std::string const PathPattern;
+    static std::string const Method;
+
     std::optional<Item> Body;
-    void WriteParams(std::shared_ptr<IOASClientRequest> req);
+    void WriteParams(std::shared_ptr<IOASClientRequest> req) const;
 };

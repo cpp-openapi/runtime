@@ -30,3 +30,5 @@ public:
     std::string GetHeader(std::string key) const override;
     int GetCode() const override;
 };
+
+class EmptyPayload{};
