@@ -5,6 +5,8 @@ class BeastClient : public IClient
 {
 public:
     using IClient::IClient;
-    // void MakeRequest(const IOASClientRequest &req) override;
-    void MakeRequest(const IOASClientRequest &req, IOASClientResponse &resp)  override;
+    std::future<std::shared_ptr<IOASClientResponse>> Do(const std::shared_ptr<IOASClientRequest> req) override;
+
+private:
+    std::shared_ptr<IOASClientResponse> doSync(const std::shared_ptr<IOASClientRequest> req);
 };

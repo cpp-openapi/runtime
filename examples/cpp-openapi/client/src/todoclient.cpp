@@ -2,18 +2,19 @@
 #include "todoclient.h"
 #include "request.h"
 #include "todo_common.h"
+#include "executor.h"
 
-AddOneResponse todoservice::AddOne(AddOneParams params)
+std::future<AddOneResponse> todoservice::AddOne(AddOneParams params)
 {
     return ProcessAPI<AddOneParams,AddOneResponse>(params, this->_cli, this->_auth);
 }
 
-FindTodoResponse todoservice::FindTodos(FindTodosParams params)
+std::future<FindTodoResponse> todoservice::FindTodos(FindTodosParams params)
 {
    return ProcessAPI<FindTodosParams,FindTodoResponse>(params, this->_cli, this->_auth);
 }
 
-DestroyOneResponse todoservice::DestroyOne(DestroyOneParams params)
+std::future<DestroyOneResponse> todoservice::DestroyOne(DestroyOneParams params)
 {
     return ProcessAPI<DestroyOneParams,DestroyOneResponse>(params, this->_cli, this->_auth);
 }

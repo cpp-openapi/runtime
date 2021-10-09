@@ -23,9 +23,9 @@ public:
     std::shared_ptr<IClient> _cli;
     AuthInfoWriter _auth = nullptr;
     void SetDefaultAuth(AuthInfoWriter auth);
-    FindTodoResponse FindTodos(FindTodosParams params);
-    AddOneResponse AddOne(AddOneParams params);
-    DestroyOneResponse DestroyOne(DestroyOneParams params);
+    std::future<FindTodoResponse> FindTodos(FindTodosParams params);
+    std::future<AddOneResponse> AddOne(AddOneParams params);
+    std::future<DestroyOneResponse> DestroyOne(DestroyOneParams params);
 };
 
 // class todoclient

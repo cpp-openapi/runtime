@@ -5,6 +5,7 @@
 #include <string>
 #include "request.h"
 #include "response.h"
+#include <future>
 
 struct ClientConfig
 {
@@ -19,6 +20,5 @@ public:
     // TODO: change return
     IClient(ClientConfig cfg): _cfg(cfg) {};
     ClientConfig _cfg;
-    // virtual void MakeRequest(const IOASClientRequest &req) = 0;
-    virtual void MakeRequest(const IOASClientRequest &req, IOASClientResponse &resp) = 0;
+    virtual std::future<std::shared_ptr<IOASClientResponse>> Do(const std::shared_ptr<IOASClientRequest> req) = 0;
 };

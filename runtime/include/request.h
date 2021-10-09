@@ -3,8 +3,10 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <memory>
 
 #include "common.h"
+#include "response.h"
 // Request for openapi
 // it can convert to http request of underlying impl
 //
@@ -27,6 +29,11 @@ public:
 
     void SetHeaderParam(std::string key, std::string val);
     void SetQueryParam(std::string key, std::string val);
+
+    // returns response for write;
+    // Typically Response and Request impl are linked, Client should not worry about which resp impl to choose.
+    // Client will write to this value after request is received.
+    std::shared_ptr<IOASClientResponse> GetResponse();
 
     template <typename T>
     void SetHeaderParam(std::string key, T val){
@@ -75,6 +82,10 @@ public:
             static_assert("type not supported");
         }
     }
+
+protected:
+    // resp that is used to write.
+    std::shared_ptr<IOASClientResponse> _resp;
 };
 
 class ClientRequestImpl : public IOASClientRequest
@@ -87,6 +98,7 @@ class ClientRequestImpl : public IOASClientRequest
     std::map<std::string, std::string> _pathParam;
 
 public:
+    ClientRequestImpl();
     void SetHeaderParam(std::string key, std::vector<std::string> val) override;
     void SetQueryParam(std::string key, std::vector<std::string> val) override;
     void SetPathParam(std::string key, std::string val) override;

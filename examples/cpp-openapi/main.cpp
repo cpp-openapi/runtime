@@ -3,9 +3,16 @@
 #include <iostream>
 #include <boost/stacktrace.hpp>
 #include "auth.h"
+#include "executor.h"
 
 int main()
 {
+    // Set the async launcher for runtime
+    Executor::GetInstance().SetExecutor([](std::function<void(void)> f)
+    {
+        std::thread(f).detach();
+    });
+
     try
     {
         ClientConfig cfg = {
@@ -21,26 +28,22 @@ int main()
         {
             FindTodosParams p;
             // p.limit = 3;
-            FindTodoResponse r = ts.FindTodos(p);
-            // std::cout << r.code << " " << r.data << std::endl;
-            // debug
-            //std::cout << r << std::endl;
-            // std::cout << "item length: " << r.payload.size() << std::endl; 
-            std::cout << "Find Todo: " << r << std::endl;
+            std::future<FindTodoResponse> r = ts.FindTodos(p);
+            std::cout << "Find Todo: " << r.get() << std::endl;
         }
 
         {
             AddOneParams p;
             p.Body = Item{0, "hello"};
-            AddOneResponse r = ts.AddOne(p);
-            std::cout << "Add one: " << r << std::endl;
+            std::future<AddOneResponse> r = ts.AddOne(p);
+            std::cout << "Add one: " << r.get() << std::endl;
         }
 
         {
             DestroyOneParams p;
             p.id = 0;
-            DestroyOneResponse r = ts.DestroyOne(p);
-            std::cout << "destroy one: " << r << std::endl;
+            std::future<DestroyOneResponse> r = ts.DestroyOne(p);
+            std::cout << "destroy one: " << r.get() << std::endl;
         }
     }
     catch(std::exception const& e)

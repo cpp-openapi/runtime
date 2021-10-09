@@ -1,5 +1,15 @@
 #include <request.h>
 
+std::shared_ptr<IOASClientResponse> IOASClientRequest::GetResponse()
+{
+    return this->_resp;
+}
+
+ClientRequestImpl::ClientRequestImpl()
+{
+    this->_resp = std::make_shared<ClientResponseImpl>();
+}
+
 void IOASClientRequest::SetHeaderParam(std::string key, std::string val)
 {
     this->SetHeaderParam(key, std::vector<std::string>({val}));

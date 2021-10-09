@@ -5,9 +5,10 @@ class CurlPPClient : public IClient
 {
 public:
     using IClient::IClient;
-    void MakeRequest(const IOASClientRequest &req, IOASClientResponse &resp)  override;
-
+    std::future<std::shared_ptr<IOASClientResponse>> Do(const std::shared_ptr<IOASClientRequest> req) override;
     void SetDebug(bool debug);
 private:
     bool _debug = false;
+
+    std::shared_ptr<IOASClientResponse> doSync(const std::shared_ptr<IOASClientRequest> req);
 };
