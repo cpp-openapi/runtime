@@ -76,4 +76,73 @@ jobs:
 
       - name: run main exe
         run: ./build/examples/cpp-openapi/main
+
+
+  windows-build:
+    runs-on: windows-2019
+    steps:
+      - uses: actions/checkout@v2
       
+      - name: Get MSVC
+        uses: ilammy/msvc-dev-cmd@v1
+
+      - name: Get specific version CMake, v3.21.2
+        uses: lukka/get-cmake@v3.21.2
+      
+      - name: Get Boost
+        uses: MarkusJx/install-boost@v2.0.0
+        id: install-boost
+        with:
+          # REQUIRED: Specify the required boost version
+          # A list of supported versions can be found here: 
+          # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
+          boost_version: 1.73.0
+
+      - name: Configure CMake
+        run: cmake . -DCMAKE_BUILD_TYPE=Debug -B build
+        env:
+          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+      
+      - name: run build
+        run: cmake --build .\build
+
+      - name: run test
+        run:  cd build; ctest -C Debug;
+
+      - name: Save main exe
+        uses: actions/upload-artifact@v2
+        with:
+          name: main-exe
+          path: build\examples\cpp-openapi\Debug\main.exe
+          retention-days: 1
+
+  windows-test:
+    runs-on: windows-2019
+    needs: windows-build
+    steps:
+      - name: download main executable
+        uses: actions/download-artifact@master
+        with:
+          name: main-exe
+          path: build\examples\cpp-openapi\Debug
+      
+      # - name: make artifact executable
+      #   run: sudo chmod +x ./build/examples/cpp-openapi/main
+
+      # run go-swagger example server
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.2
+
+      - name: Get go-swagger repo
+        run: git clone --depth 1 https://github.com/go-swagger/go-swagger.git
+    
+      - name: build server
+        run: cd go-swagger; go build -o ..\server examples\auto-configure\cmd\a-to-do-list-application-server\main.go;
+      
+      - name: run server and client test
+        run: |
+            Start-Process -NoNewWindow -FilePath ".\server" -ArgumentList "--port 12345";
+            Start-Sleep -s 10;
+            .\build\examples\cpp-openapi\Debug\main.exe;

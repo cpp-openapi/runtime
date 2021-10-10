@@ -1,7 +1,7 @@
 #include "todoclient.h"
 #include "typefactory.h"
 #include <iostream>
-#include <boost/stacktrace.hpp>
+// #include <boost/stacktrace.hpp>
 #include "auth.h"
 #include "executor.h"
 
@@ -49,7 +49,7 @@ int main()
     catch(std::exception const& e)
     {
         std::cerr << "Error: " << e.what() << std::endl;
-        std::cout << boost::stacktrace::stacktrace();
+        // std::cout << boost::stacktrace::stacktrace();
         return EXIT_FAILURE;
     }
     return EXIT_SUCCESS;

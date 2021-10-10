@@ -1,3 +1,14 @@
+# add beast deps
+
+# boost has various deps. So prefer system boost install
+
+# boost root needs to be pre set in system env var
+# set(BOOST_ROOT "C:\\local\\boost_1_76_0")
+
+set(Boost_USE_STATIC_LIBS ON)
+# ADD_DEFINITIONS("-DBOOST_ALL_NO_LIB")
+find_package(Boost REQUIRED)
+
 file(GLOB SOURCES
     include/*.h
     src/*.cpp
@@ -21,4 +32,7 @@ target_include_directories(
 #   message(STATUS "dir='${dir}'")
 # endforeach()
 
-target_link_libraries(cpp-openapi-client-beast PRIVATE ${Boost_LIBRARIES} cpp-openapi-runtime)
+target_link_libraries(cpp-openapi-client-beast 
+# PRIVATE ${Boost_LIBRARIES} 
+PRIVATE cpp-openapi-runtime
+)

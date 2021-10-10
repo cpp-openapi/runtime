@@ -50,4 +50,4 @@ target_include_directories(
     "${curlpp_SOURCE_DIR}/include"
 )
 
-target_link_libraries(cpp-openapi-client-curlpp PRIVATE ${Boost_LIBRARIES} cpp-openapi-runtime curlpp_static)
+target_link_libraries(cpp-openapi-client-curlpp PRIVATE cpp-openapi-runtime curlpp_static)
