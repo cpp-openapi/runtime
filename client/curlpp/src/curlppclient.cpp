@@ -116,13 +116,14 @@ std::shared_ptr<IOASClientResponse> CurlPPClient::doSync(const std::shared_ptr<I
     }
     request.setOpt(new Url(url));
 
-    std::stringstream os;
-    curlpp::options::WriteStream ws(&os);
+    std::shared_ptr<IOASClientResponse> resp = req->GetResponse();
+
+    // std::stringstream os;
+    curlpp::options::WriteStream ws(&resp->GetBodyOStream());
     request.setOpt(ws);
     request.perform();
 
-    std::shared_ptr<IOASClientResponse> resp = req->GetResponse();
-    resp->SetBodyResp(os.str());
+    // resp->SetBodyResp(os.str());
     long http_code = curlpp::infos::ResponseCode::get(request);
     resp->SetCode(http_code);
     return resp;

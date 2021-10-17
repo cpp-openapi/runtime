@@ -168,14 +168,14 @@ void testJsonImpl(std::shared_ptr<Json> j)
 
 TEST(Json, nlohmannjson) {    
     std::shared_ptr<Json> j = std::make_shared<NlohmannJson>();
-    j->SetJson(personJson);
+    j->Parse(personJson);
     testJsonImpl(j);
 }
 
 TEST(Json, rapidjson)
 {
     std::shared_ptr<Json> j = std::make_shared<RapidJson>();
-    j->SetJson(personJson);
+    j->Parse(personJson);
     testJsonImpl(j);
 }
 
@@ -257,7 +257,7 @@ TEST(Json, rapidjson_serialize)
 TEST(Json, nolhmannjson_serialize_deserialize_identity)
 {
     std::shared_ptr<Json> j = std::make_shared<NlohmannJson>();
-    j->SetJson(personJson);
+    j->Parse(personJson);
     Person p;
     p.DeserializeJSON(j);
 
@@ -274,7 +274,7 @@ TEST(Json, nolhmannjson_serialize_deserialize_identity)
 TEST(Json, rapidjson_serialize_deserialize_identity)
 {
     std::shared_ptr<Json> j = std::make_shared<RapidJson>();
-    j->SetJson(personJson);
+    j->Parse(personJson);
     Person p;
     p.DeserializeJSON(j);
 

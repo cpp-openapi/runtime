@@ -9,7 +9,7 @@ void ClientResponseImpl::SetHeaderResp(std::string key, std::vector<std::string>
 
 void ClientResponseImpl::SetBodyResp(std::string body)
 {
-    this->_body = body;
+    this->_bodyStream << body;
 }
 
 void ClientResponseImpl::SetCode(int code)
@@ -18,7 +18,7 @@ void ClientResponseImpl::SetCode(int code)
 }
 
 std::string ClientResponseImpl::GetBody() const {
-    return this->_body;
+    return this->_bodyStream.str();
 }
 
 
@@ -36,4 +36,14 @@ std::string ClientResponseImpl::GetHeader(std::string key) const
 int ClientResponseImpl::GetCode() const
 {
     return this->_code;
+}
+
+std::ostream& ClientResponseImpl::GetBodyOStream()
+{
+    return this->_bodyStream;
+}
+
+std::istream& ClientResponseImpl::GetBodyIStream()
+{
+    return this->_bodyStream;
 }

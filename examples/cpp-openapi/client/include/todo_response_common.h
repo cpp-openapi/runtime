@@ -19,7 +19,7 @@ void ReadResponseCommon(R &res, std::shared_ptr<IOASClientResponse> resp)
             return;
         }
         std::shared_ptr<Json> j = TypeFactory::NewJson();
-        j->SetJson(body);
+        j->Parse(body);
         res.Payload = Json::Get<U>(j);
     }
 }

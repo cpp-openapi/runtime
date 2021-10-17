@@ -8,7 +8,7 @@ std::shared_ptr<Json> RapidJson::New()
     return std::make_shared<RapidJson>();
 }
 
-std::shared_ptr<Json>  RapidJson::operator[](const std::string &key)
+std::shared_ptr<Json>  RapidJson::GetMember(const std::string &key)
 {
     if (!this->HasKey(key))
     {
@@ -57,23 +57,9 @@ void RapidJson::SetString(std::string val)
     this->_j.SetString(val.c_str(),val.size(),_j.GetAllocator());
 }
 
-void RapidJson::SetJson(std::string data)
+void RapidJson::Parse(std::string data)
 {
     this->_j.Parse(data.c_str());
-}
-
-bool RapidJson::GetValue(std::string name, std::shared_ptr<Json> &ret)
-{
-    if(!_j.IsObject() || !_j.HasMember(name.c_str())|| !_j[name.c_str()].IsObject())
-    {
-        return false;
-    }
-    rapidjson::Value const &v = _j[name.c_str()];
-    //rapidjson::Value copy(v,_j.GetAllocator());
-    // todo optimize
-    std::shared_ptr<RapidJson> j = std::make_shared<RapidJson>();
-    j->_j.CopyFrom(v, j->_j.GetAllocator());
-    return true;
 }
 
 bool RapidJson::ToArray(std::vector<std::shared_ptr<Json>> &ret)

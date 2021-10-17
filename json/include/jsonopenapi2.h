@@ -7,41 +7,16 @@
 #include <vector>
 #include "runtime_types.h"
 
-class Json
+// inner json. Must implemente Json1 virtual functions
+template<typename J>
+class Json2
 {
 public:
-    // returns a empty json of the same impl type
-    virtual std::shared_ptr<Json> New() = 0;
-    // sets the json content
-    virtual void Parse(std::string data) = 0;
+    Json2(): inner_() { }
 
-    virtual bool HasKey(const std::string &key) = 0;
-    
-    virtual std::shared_ptr<Json> GetMember(const std::string &key) = 0;
+    Json2(J inner): inner_(inner) { }
 
-    virtual int GetInt() = 0;
-    
-    virtual void SetInt(int val) = 0;
-
-    virtual std::string GetString() = 0;
-
-    virtual void SetString(std::string val) = 0;
-
-    virtual bool ToArray(std::vector<std::shared_ptr<Json>> &ret) = 0;
-
-    // make json array
-    virtual void FlattenFrom(std::vector<std::shared_ptr<Json>> arr) = 0;
-
-    virtual std::string ToString() = 0;
-
-    // virtual void operator=(int val) = 0;
-    // virtual void operator=(std::string val) = 0;
-    virtual bool AddMemberInt(std::string name, int val) = 0;
-
-    virtual bool AddMemberString(std::string name, std::string val) = 0;
-
-    // obj can be array?
-    virtual bool AddMember(std::string name, std::shared_ptr<Json> val) = 0;
+    J inner_;
 
     // T must has deserialize function
     template<typename T>
@@ -49,10 +24,10 @@ public:
     {
         std::vector<T> res;
         std::vector<std::shared_ptr<Json>> arr;
-        bool isArray = this->ToArray(arr);
+        bool isArray = inner_.ToArray(arr);
         // std::cout <<"is array: "<< isArray << " debug size: "<< res.size() << std::endl;
         for (auto& e : arr) {
-            T i = Json::Get<T>(e);
+            T i = Json2::Get<T>(e);
             res.push_back(i);
             //std::cout <<"item: "<< i.id << " description: " << i.description << " string:" <<e->ToString()<<std::endl;
         }
@@ -60,21 +35,21 @@ public:
     }
 
     template<typename T>
-    static T Get(std::shared_ptr<Json> j)
+    static T Get(std::shared_ptr<Json2> j)
     {
         T i;
         // handle primitive types
         if constexpr (std::is_same<T, int>::value) 
         {
-            i = j->GetInt();        
+            i = j->inner_.GetInt();        
         }else if constexpr (std::is_same<T, std::string>::value)
         {
-            i = j->GetString();
+            i = j->inner_.GetString();
         }
         else if constexpr(is_vector<T>::value)
         {
             using V = typename T::value_type;
-            i = j->ToArray<V>();
+            i = j->ToArray<V>(); // json2 to array
         }
         else
         {
@@ -92,15 +67,15 @@ public:
     }
 
     template<typename T>
-    static T GetMember(std::shared_ptr<Json> j, std::string key)
+    static T GetMember(std::shared_ptr<Json2> j, std::string key)
     {
-        std::shared_ptr<Json> value = j->GetMember(key);
-        return Json::Get<T>(value);
+        std::shared_ptr<Json2> value = j->inner_.GetMember(key);
+        return Json2::Get<T>(value);
     }
 
     // copy val into j
     template<typename T>
-    static void ToJson(std::shared_ptr<Json> j, T val){
+    static void ToJson(std::shared_ptr<Json2> j, T val){
         if constexpr (std::is_same<T, int>::value)
         {
             j->SetInt(val);

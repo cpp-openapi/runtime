@@ -98,13 +98,15 @@ std::shared_ptr<IOASClientResponse> BeastClient::doSync(const std::shared_ptr<IO
 
         // Declare a container to hold the response
         http::response<http::dynamic_body> res;
-
+        
         // Receive the HTTP response
         http::read(stream, buffer, res);
 
-        // Translate to respose to return
+        // Translate to response to return
         std::shared_ptr<IOASClientResponse> resp = req->GetResponse();
-        resp->SetBodyResp(beast::buffers_to_string(res.body().data()));
+        // TODO: this might not be efficient since it copies body.
+        resp->GetBodyOStream() << beast::buffers_to_string(res.body().data());
+
         for (auto it = res.begin(); it != res.end(); it++)
         {
 

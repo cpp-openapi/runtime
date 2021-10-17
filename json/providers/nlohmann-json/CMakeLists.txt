@@ -25,7 +25,7 @@ ${SOURCES})
 
 target_include_directories(
     cpp-openapi-json-nlohmann
-    PUBLIC ${cpp-openapi-json-nlohmann_SOURCE_DIR}/include
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 target_link_libraries(cpp-openapi-json-nlohmann PUBLIC cpp-openapi-json)

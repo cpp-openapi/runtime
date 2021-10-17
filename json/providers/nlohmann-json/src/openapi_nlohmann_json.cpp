@@ -7,7 +7,7 @@ std::shared_ptr<Json> NlohmannJson::New()
     return std::make_shared<NlohmannJson>();
 }
 
-std::shared_ptr<Json>  NlohmannJson::operator[](const std::string &key)
+std::shared_ptr<Json>  NlohmannJson::GetMember(const std::string &key)
 {
     std::shared_ptr<NlohmannJson> j = std::make_shared<NlohmannJson>();
 
@@ -55,24 +55,10 @@ void NlohmannJson::SetString(std::string val)
     this->_j = val;
 }
 
-void NlohmannJson::SetJson(std::string data)
+void NlohmannJson::Parse(std::string data)
 {
     
     this->_j = nlohmann::json::parse(data);
-}
-
-bool NlohmannJson::GetValue(std::string name, std::shared_ptr<Json> &ret)
-{
-    if (!this->_j.contains(name))
-    {   
-        return false;
-    }
-    // TODO: this is no efficient?
-    nlohmann::json inner = this->_j.at(name);
-    std::shared_ptr<NlohmannJson> np = std::make_shared<NlohmannJson>();
-    np->setInternal(inner);
-    ret = np;
-    return true;
 }
 
 void NlohmannJson::setInternal(nlohmann::json j)
