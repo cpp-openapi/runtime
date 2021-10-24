@@ -1,10 +1,15 @@
 #include "gtest/gtest.h"
 #include <string>
 #include "openapi_nlohmann_json2.h"
-// #include "openapi_rapidjson.h"
+#include "openapi_rapidjson2.h"
 #include <memory>
 
+
+#ifdef OPENAPI_RAPIDJSON
+typedef RapidJson2 Json;
+#elif defined(OPENAPI_NLOHMANNJSON)
 typedef NlohmannJson2 Json;
+#endif
 
 TEST(Json2, GetInt)
 {
@@ -15,6 +20,7 @@ TEST(Json2, GetInt)
             "int" : 1
         }
     )");
+
     ASSERT_EQ(1, x.GetMember<int>("int"));
     ASSERT_EQ("str_val", x.GetMember<std::string>("str"));
 }

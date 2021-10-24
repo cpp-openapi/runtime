@@ -5,6 +5,9 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        OPENAPI_JSON: ["OPENAPI_NLOHMANNJSON", "OPENAPI_RAPIDJSON"]
     steps:
     - uses: actions/checkout@v2
 
@@ -22,7 +25,9 @@ jobs:
     #   run: sudo apt-get install libssl-dev libcurl4-openssl-dev
     
     - name: run cmake
-      run: mkdir build && cd build && cmake ../
+      env:
+        OPENAPI_JSON: ${{ matrix.OPENAPI_JSON }}
+      run: mkdir build && cd build && cmake -DOPENAPI_JSON=${OPENAPI_JSON} ../
 
     - name: run build
       run: cd build && cmake --build .

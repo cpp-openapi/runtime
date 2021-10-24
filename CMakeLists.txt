@@ -31,6 +31,5 @@ FetchContent_MakeAvailable(googletest)
 
 enable_testing()
 add_subdirectory(json/test)
-add_subdirectory(json/providers/nlohmann-json/test)
 
 add_subdirectory(runtime/test)

@@ -10,7 +10,7 @@ class NlohmannJson2
 public:
     NlohmannJson2(): _j() { }
 
-    void Parse(std::string data);
+    void Parse(const std::string &data);
 
     bool HasKey(const std::string &key) const;
 
