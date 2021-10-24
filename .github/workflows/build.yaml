@@ -4,21 +4,30 @@ on: [push, pull_request]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         OPENAPI_JSON: ["OPENAPI_NLOHMANNJSON", "OPENAPI_RAPIDJSON"]
+        BUILD_TYPE: ["Debug", "Release"]
+        os: [ ubuntu-latest, windows-latest ]
     steps:
     - uses: actions/checkout@v2
+
+    - name: Get MSVC
+      uses: ilammy/msvc-dev-cmd@v1
+      if: ${{ matrix.os == 'windows-latest' }}
 
     - name: Get specific version CMake, v3.21.2
       uses: lukka/get-cmake@v3.21.2
     
-    - name: update pkg manager
-      run: sudo apt-get update
-
-    - name: Get boost
-      run: sudo apt-get install libboost-all-dev
+    - name: Get Boost
+      uses: MarkusJx/install-boost@v2.0.0
+      id: install-boost
+      with:
+        # REQUIRED: Specify the required boost version
+        # A list of supported versions can be found here: 
+        # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
+        boost_version: 1.73.0
 
     # curl is built from source now. No need to have these libs
     # - name: Get curl etc
@@ -26,45 +35,39 @@ jobs:
     
     - name: run cmake
       env:
-        OPENAPI_JSON: ${{ matrix.OPENAPI_JSON }}
-      run: mkdir build && cd build && cmake -DOPENAPI_JSON=${OPENAPI_JSON} ../
+        BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
+      run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DOPENAPI_JSON=${{ matrix.OPENAPI_JSON }} -B build
 
     - name: run build
-      run: cd build && cmake --build .
+      run: cmake --build build --config ${{ matrix.BUILD_TYPE }}
     
     - name: run test
-      run: cd build && ctest
+      run: ctest -C ${{ matrix.BUILD_TYPE }} --test-dir build
 
+    # only check memory in ubuntu
     - name: get valgrind
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: sudo apt-get install valgrind
 
     - name: check test memory corruption
+      if: ${{ matrix.os == 'ubuntu-latest' }}
       run: cd build && valgrind ./json/test/json_test
 
     - name: Save main exe
       uses: actions/upload-artifact@v2
       with:
-        name: main-exe
-        path: build/examples/cpp-openapi/main
+        name: ${{ matrix.os }}_${{ matrix.BUILD_TYPE }}_${{ matrix.OPENAPI_JSON }}_main-exe
+        path: |
+          build/examples/cpp-openapi/main
+          build/examples/cpp-openapi/**/main.exe
         retention-days: 1
-      
 
-  test:
-    runs-on: ubuntu-latest
-    needs: build
+  swagger-server:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, windows-latest ]
     steps:
-      #- uses: actions/checkout@v2
-
-      - name: download main executable
-        uses: actions/download-artifact@master
-        with:
-          name: main-exe
-          path: build/examples/cpp-openapi
-      
-      - name: make artifact executable
-        run: sudo chmod +x ./build/examples/cpp-openapi/main
-
-      # run go-swagger example server
       - name: Set up Go
         uses: actions/setup-go@v2
         with:
@@ -76,78 +79,50 @@ jobs:
       - name: build server
         run: cd go-swagger && go build -o ../server examples/auto-configure/cmd/a-to-do-list-application-server/main.go
       
-      - name: run server
-        run: ./server --port=12345 &
-
-      - name: run main exe
-        run: ./build/examples/cpp-openapi/main
-
-
-  windows-build:
-    runs-on: windows-2019
-    steps:
-      - uses: actions/checkout@v2
-      
-      - name: Get MSVC
-        uses: ilammy/msvc-dev-cmd@v1
-
-      - name: Get specific version CMake, v3.21.2
-        uses: lukka/get-cmake@v3.21.2
-      
-      - name: Get Boost
-        uses: MarkusJx/install-boost@v2.0.0
-        id: install-boost
-        with:
-          # REQUIRED: Specify the required boost version
-          # A list of supported versions can be found here: 
-          # https://github.com/actions/boost-versions/blob/main/versions-manifest.json
-          boost_version: 1.73.0
-
-      - name: Configure CMake
-        run: cmake . -DCMAKE_BUILD_TYPE=Debug -B build
-        env:
-          BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
-      
-      - name: run build
-        run: cmake --build .\build
-
-      - name: run test
-        run:  cd build; ctest -C Debug;
-
-      - name: Save main exe
+      - name: Save swagger server
         uses: actions/upload-artifact@v2
         with:
-          name: main-exe
-          path: build\examples\cpp-openapi\Debug\main.exe
+          name: ${{ matrix.os }}_server
+          path: ./server
           retention-days: 1
 
-  windows-test:
-    runs-on: windows-2019
-    needs: windows-build
+  test:
+    runs-on: ${{ matrix.os }}
+    needs: [build, swagger-server]
+    strategy:
+      matrix:
+        OPENAPI_JSON: ["OPENAPI_NLOHMANNJSON", "OPENAPI_RAPIDJSON"]
+        BUILD_TYPE: ["Debug", "Release"]
+        os: [ ubuntu-latest, windows-latest ]
     steps:
       - name: download main executable
         uses: actions/download-artifact@master
         with:
-          name: main-exe
-          path: build\examples\cpp-openapi\Debug
+          name: ${{ matrix.os }}_${{ matrix.BUILD_TYPE }}_${{ matrix.OPENAPI_JSON }}_main-exe
+          path: build/examples/cpp-openapi
       
-      # - name: make artifact executable
-      #   run: sudo chmod +x ./build/examples/cpp-openapi/main
-
-      # run go-swagger example server
-      - name: Set up Go
-        uses: actions/setup-go@v2
+      - name: download server
+        uses: actions/download-artifact@master
         with:
-          go-version: 1.16.2
+          name: ${{ matrix.os }}_server
+          path: .
 
-      - name: Get go-swagger repo
-        run: git clone --depth 1 https://github.com/go-swagger/go-swagger.git
-    
-      - name: build server
-        run: cd go-swagger; go build -o ..\server examples\auto-configure\cmd\a-to-do-list-application-server\main.go;
-      
-      - name: run server and client test
+      - name: make artifact executable
+        if: ${{ matrix.os == 'ubuntu-latest' }}
         run: |
-            Start-Process -NoNewWindow -FilePath ".\server" -ArgumentList "--port 12345";
-            Start-Sleep -s 10;
-            .\build\examples\cpp-openapi\Debug\main.exe;
+          sudo chmod +x ./build/examples/cpp-openapi/main
+          sudo chmod +x ./server
+      
+      - name: run server and test linux
+        if: ${{ matrix.os == 'ubuntu-latest' }}
+        run: |
+          ./server --port=12345 &
+          sleep 5s
+          ./build/examples/cpp-openapi/main
+
+      - name: run server and test windows
+        if: ${{ matrix.os == 'windows-latest' }}
+        run: |
+          Start-Process -NoNewWindow -FilePath ".\server" -ArgumentList "--port 12345";
+          Start-Sleep -s 10;
+          .\build\examples\cpp-openapi\${{ matrix.BUILD_TYPE }}\main.exe;
