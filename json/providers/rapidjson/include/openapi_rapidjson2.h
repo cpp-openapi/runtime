@@ -106,7 +106,7 @@ void RapidJson2::Set(T val)
     }
     else if constexpr (std::is_same<T, std::string>::value)
     {
-        this->_j.SetString(val.c_str(),val.size(),_j.GetAllocator());
+        this->_j.SetString(val.c_str(),static_cast<rapidjson::SizeType>(val.size()),_j.GetAllocator());
     }
     else if constexpr(std::is_same<T, RapidJson2>::value)
     {
@@ -144,7 +144,7 @@ template<typename T>
 void RapidJson2::AddMember(const std::string &key, T val)
 {
     rapidjson::Value name;
-    name.SetString(key.c_str(),key.size(),_j.GetAllocator());
+    name.SetString(key.c_str(),static_cast<rapidjson::SizeType>(key.size()),_j.GetAllocator());
     
     RapidJson2 jVal;
     jVal.Set(val);

@@ -1,13 +1,16 @@
 #include "gtest/gtest.h"
 #include <string>
-#include "openapi_nlohmann_json2.h"
-#include "openapi_rapidjson2.h"
+
+#include <nlohmann/json.hpp> // for raw json compare
 #include <memory>
 
+#include "openapi_json_macro.h"
 
 #ifdef OPENAPI_RAPIDJSON
+#include "openapi_rapidjson2.h"
 typedef RapidJson2 Json;
 #elif defined(OPENAPI_NLOHMANNJSON)
+#include "openapi_nlohmann_json2.h"
 typedef NlohmannJson2 Json;
 #endif
 
@@ -46,19 +49,7 @@ TEST(Json2, GetAndSetStruct)
     {
         std::string title;
         int pages;
-        void DeserializeJSON(const Json & j)
-        {
-            this->title = j.GetMember<std::string>("title");
-            this->pages = j.GetMember<int>("pages");
-        }
-
-        Json SerializeJSON()
-        {
-            Json j;
-            j.AddMember("title", this->title);
-            j.AddMember("pages", this->pages);
-            return j;
-        }
+        OPENAPI_SERILIZATION_FUNCS(title, pages)
     };
 
     Json x;

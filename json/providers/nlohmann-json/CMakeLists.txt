@@ -3,7 +3,7 @@ message(STATUS "Fetching nlohmann json")
 include(FetchContent)
 FetchContent_Declare(json
   GIT_REPOSITORY https://github.com/nlohmann/json.git
-  GIT_TAG v3.7.3)
+  GIT_TAG v3.10.4)
 FetchContent_GetProperties(json)
 if(NOT json_POPULATED)
   FetchContent_Populate(json)

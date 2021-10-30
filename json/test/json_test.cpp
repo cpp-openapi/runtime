@@ -1,8 +1,17 @@
 #include "gtest/gtest.h"
 #include <string>
-#include "openapi_nlohmann_json.h"
-#include "openapi_rapidjson.h"
 #include <memory>
+
+#include "openapi_json_macro.h"
+#include <nlohmann/json.hpp> // for raw json compare
+
+#ifdef OPENAPI_RAPIDJSON
+#include "openapi_rapidjson2.h"
+typedef RapidJson2 Json;
+#elif defined(OPENAPI_NLOHMANNJSON)
+#include "openapi_nlohmann_json2.h"
+typedef NlohmannJson2 Json;
+#endif
 
 const char * personJson = R"(
     {
@@ -35,47 +44,20 @@ struct Address
 {
     std::string state;
     std::string city;
-    void DeserializeJSON(std::shared_ptr<Json> j)
-    {
-        this->state = Json::GetMember<std::string>(j, "state");
-        this->city = Json::GetMember<std::string>(j, "city");
-    }
-
-    void SerializeJSON(std::shared_ptr<Json> j)
-    {
-        Json::AddMember<std::string>(j, "state", this->state);
-        Json::AddMember<std::string>(j, "city", this->city);
-    }
+    OPENAPI_SERILIZATION_FUNCS(state, city)
 };
 
 struct Company
 {
     std::string name;
     std::shared_ptr<Address> location;
-    void DeserializeJSON(std::shared_ptr<Json> j)
-    {
-        this->name = Json::GetMember<std::string>(j, "name");
-        this->location = Json::GetMember<std::shared_ptr<Address>>(j, "location");
-    }
-
-    void SerializeJSON(std::shared_ptr<Json> j)
-    {
-        Json::AddMember<std::string>(j, "name", this->name);
-        Json::AddMember<std::shared_ptr<Address>>(j, "location", this->location);
-    }
+    OPENAPI_SERILIZATION_FUNCS(name, location)
 };
 
 struct Order
 {
     int id;
-    void DeserializeJSON(std::shared_ptr<Json> j)
-    {
-        this->id = Json::GetMember<int>(j, "id");
-    }
-    void SerializeJSON(std::shared_ptr<Json> j)
-    {
-        Json::AddMember<int>(j, "id", this->id);
-    }
+    OPENAPI_SERILIZATION_FUNCS(id)
 };
 
 struct Person
@@ -87,36 +69,14 @@ struct Person
     std::vector<int> project_ids;
     std::vector<std::string> project_names;
     std::vector<std::shared_ptr<Order>> orders;
-    void DeserializeJSON(std::shared_ptr<Json> j)
-    {
-        this->name = Json::GetMember<std::string>(j, "name");
-        this->age = Json::GetMember<int>(j, "age");
-        this->address = Json::GetMember<std::vector<Address>>(j, "address");
-        this->company = Json::GetMember<Company>(j, "company");
-
-        // primitive array
-        this->project_ids = Json::GetMember<std::vector<int>>(j, "project_ids");
-        this->project_names = Json::GetMember<std::vector<std::string>>(j, "project_names");
-
-        // ptr array
-        this->orders = Json::GetMember<std::vector<std::shared_ptr<Order>>>(j, "orders");
-    }
-
-    void SerializeJSON(std::shared_ptr<Json> j)
-    {
-        Json::AddMember<std::string>(j, "name", this->name);
-        Json::AddMember<int>(j, "age", this->age);
-        Json::AddMember<std::vector<Address>>(j, "address", this->address);
-        Json::AddMember<Company>(j, "company", this->company);
-
-        Json::AddMember<std::vector<int>>(j, "project_ids", this->project_ids);
-        Json::AddMember<std::vector<std::string>>(j, "project_names", this->project_names);
-        Json::AddMember<std::vector<std::shared_ptr<Order>>>(j, "orders", this->orders);
-    }
+    OPENAPI_SERILIZATION_FUNCS(name, age, address, company, project_ids, project_names, orders)
 };
 
-void testJsonImpl(std::shared_ptr<Json> j)
+TEST(Json, Deserialize)
 {
+    Json j;
+    j.Parse(personJson);
+
     Person p;
     p.DeserializeJSON(j);
 
@@ -166,23 +126,9 @@ void testJsonImpl(std::shared_ptr<Json> j)
     ASSERT_EQ(12,p.orders[1]->id);
 }
 
-TEST(Json, nlohmannjson) {    
-    std::shared_ptr<Json> j = std::make_shared<NlohmannJson>();
-    j->Parse(personJson);
-    testJsonImpl(j);
-}
-
-TEST(Json, rapidjson)
+TEST(Json, Serialize)
 {
-    std::shared_ptr<Json> j = std::make_shared<RapidJson>();
-    j->Parse(personJson);
-    testJsonImpl(j);
-}
-
-
-void testJsonSerialize(std::shared_ptr<Json> j)
-{
-   Person p;
+    Person p;
     p.name = "John";
     p.age = 10;
     p.address = {
@@ -211,14 +157,14 @@ void testJsonSerialize(std::shared_ptr<Json> j)
     p.orders[1]->id = 12;
 
 
-    p.SerializeJSON(j);
+    Json j = p.SerializeJSON();
 
-    ASSERT_EQ(p.name, Json::GetMember<std::string>(j, "name"));
-    ASSERT_EQ(p.age, Json::GetMember<int>(j, "age"));
+    ASSERT_EQ(p.name, j.GetMember<std::string>("name"));
+    ASSERT_EQ(p.age, j.GetMember<int>("age"));
 
     // address
     std::vector<Address> &addressExpect = p.address;
-    std::vector<Address> addressResult = Json::GetMember<std::vector<Address>>(j, "address");
+    std::vector<Address> addressResult = j.GetMember<std::vector<Address>>("address");
     ASSERT_EQ(addressExpect.size(), addressResult.size());
     ASSERT_EQ(addressExpect[0].state, addressResult[0].state);
     ASSERT_EQ(addressExpect[0].city, addressResult[0].city);
@@ -227,63 +173,32 @@ void testJsonSerialize(std::shared_ptr<Json> j)
 
     // company
     Company companyExpected = p.company;
-    Company companyResult = Json::GetMember<Company>(j, "company");
+    Company companyResult = j.GetMember<Company>("company");
     ASSERT_EQ(companyExpected.name, companyResult.name);
 
     // array
-    ASSERT_EQ(p.project_ids, Json::GetMember<std::vector<int>>(j, "project_ids"));
-    ASSERT_EQ(p.project_names, Json::GetMember<std::vector<std::string>>(j, "project_names"));
+    ASSERT_EQ(p.project_ids, j.GetMember<std::vector<int>>("project_ids"));
+    ASSERT_EQ(p.project_names, j.GetMember<std::vector<std::string>>("project_names"));
 
     // orders
     std::vector<std::shared_ptr<Order>> & orderExpected = p.orders;
-    std::vector<std::shared_ptr<Order>> ordersResult =  Json::GetMember<std::vector<std::shared_ptr<Order>>>(j, "orders");
+    std::vector<std::shared_ptr<Order>> ordersResult =  j.GetMember<std::vector<std::shared_ptr<Order>>>("orders");
     ASSERT_EQ(orderExpected.size(), ordersResult.size());
     ASSERT_EQ(orderExpected[0]->id, ordersResult[0]->id);
     ASSERT_EQ(orderExpected[1]->id, ordersResult[1]->id);
 }
 
-TEST(Json, nolhmannjson_serialize)
+TEST(Json, deserialize_identity)
 {
-    std::shared_ptr<NlohmannJson> j = std::make_shared<NlohmannJson>();
-    testJsonSerialize(j);
-}
-
-TEST(Json, rapidjson_serialize)
-{
-    std::shared_ptr<RapidJson> j = std::make_shared<RapidJson>();  
-    testJsonSerialize(j);
-}
-
-TEST(Json, nolhmannjson_serialize_deserialize_identity)
-{
-    std::shared_ptr<Json> j = std::make_shared<NlohmannJson>();
-    j->Parse(personJson);
+    Json j;
+    j.Parse(personJson);
     Person p;
     p.DeserializeJSON(j);
 
-    std::shared_ptr<Json> j2 = std::make_shared<NlohmannJson>();
-    p.SerializeJSON(j2);
+    Json j2 = p.SerializeJSON();
 
     nlohmann::json jExpect = nlohmann::json::parse(personJson);
-    nlohmann::json jResult = nlohmann::json::parse(j2->ToString());
+    nlohmann::json jResult = nlohmann::json::parse(j2.ToString());
     ASSERT_TRUE(jExpect == jResult);
-
     //std::cout << "debug" << j2->ToString() << std::endl;
-}
-
-TEST(Json, rapidjson_serialize_deserialize_identity)
-{
-    std::shared_ptr<Json> j = std::make_shared<RapidJson>();
-    j->Parse(personJson);
-    Person p;
-    p.DeserializeJSON(j);
-
-    std::shared_ptr<Json> j2 = std::make_shared<RapidJson>();
-    p.SerializeJSON(j2);
-
-    rapidjson::Document jExpect;
-    jExpect.Parse(personJson);
-    rapidjson::Document jResult;
-    jResult.Parse(j2->ToString().c_str());
-    ASSERT_TRUE(jExpect == jResult);
 }
