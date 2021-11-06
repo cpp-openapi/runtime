@@ -6,11 +6,11 @@
 #include <nlohmann/json.hpp> // for raw json compare
 
 #ifdef OPENAPI_RAPIDJSON
-#include "openapi_rapidjson2.h"
-typedef RapidJson2 Json;
+#include "openapi_rapidjson.h"
+typedef RapidJson Json;
 #elif defined(OPENAPI_NLOHMANNJSON)
-#include "openapi_nlohmann_json2.h"
-typedef NlohmannJson2 Json;
+#include "openapi_nlohmann_json.h"
+typedef NlohmannJson Json;
 #endif
 
 const char *personJson = R"(

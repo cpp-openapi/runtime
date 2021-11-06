@@ -9,11 +9,11 @@
 #include "openapi_json_macro.h"
 
 #ifdef OPENAPI_RAPIDJSON
-#include "openapi_rapidjson2.h"
-typedef RapidJson2 Json;
+#include "openapi_rapidjson.h"
+typedef RapidJson Json;
 #elif defined(OPENAPI_NLOHMANNJSON)
-#include "openapi_nlohmann_json2.h"
-typedef NlohmannJson2 Json;
+#include "openapi_nlohmann_json.h"
+typedef NlohmannJson Json;
 #endif
 
 TEST(Json2, GetInt)
