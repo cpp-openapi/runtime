@@ -18,7 +18,10 @@ public:
     std::string ToString() const;
 
     template<typename T>
-    static RapidJson Serialize(T val);
+    static std::string Serialize(T val);
+
+    template<typename T>
+    static T Deserialize(const std::string &data);
 
     template<typename T>
     T Get() const;
@@ -38,11 +41,19 @@ private:
 };
 
 template<typename T>
-RapidJson RapidJson::Serialize(T val)
+std::string RapidJson::Serialize(T val)
 {
     RapidJson j;
     j.Set(val);
-    return j;
+    return j.ToString();
+}
+
+template<typename T>
+T RapidJson::Deserialize(const std::string &data)
+{
+    RapidJson j;
+    j.Parse(data);
+    return j.Get<T>();
 }
 
 template<typename T>

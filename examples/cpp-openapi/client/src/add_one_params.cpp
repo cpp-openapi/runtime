@@ -12,7 +12,6 @@ void AddOneParams::WriteParams(std::shared_ptr<IOASClientRequest> req) const
 
     if (this->Body.has_value())
     {
-        const Json j = this->Body->SerializeJSON();
-        req->SetBodyParam(j.ToString());
+        req->SetBodyParam(Json::Serialize(this->Body));
     }
 }

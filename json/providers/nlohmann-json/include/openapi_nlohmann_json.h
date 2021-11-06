@@ -1,6 +1,5 @@
 #pragma once
 
-// #include "jsonopenapi.h"
 #include "runtime_types.h"
 #include <nlohmann/json.hpp>
 #include <memory>
@@ -18,7 +17,10 @@ public:
     std::string ToString() const;
 
     template<typename T>
-    static NlohmannJson Serialize(T val);
+    static std::string Serialize(T val);
+
+    template<typename T>
+    static T Deserialize(const std::string &data);
 
     template<typename T>
     T Get() const;
@@ -39,11 +41,19 @@ private:
 };
 
 template<typename T>
-NlohmannJson NlohmannJson::Serialize(T val)
+std::string NlohmannJson::Serialize(T val)
 {
     NlohmannJson j;
     j.Set(val);
-    return j;
+    return j.ToString();
+}
+
+template<typename T>
+T NlohmannJson::Deserialize(const std::string &data)
+{
+    NlohmannJson j;
+    j.Parse(data);
+    return j.Get<T>();
 }
 
 // T is primitive or vector or deserializable

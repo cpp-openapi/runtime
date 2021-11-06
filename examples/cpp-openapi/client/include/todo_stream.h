@@ -14,8 +14,7 @@ std::ostream& WriteResponseToStream(std::ostream& os, const R & resp)
     {
         if(resp.Payload.has_value())
         {
-            Json j = Json::Serialize(resp.Payload.value());
-            payloadStr = j.ToString();
+            payloadStr = Json::Serialize(resp.Payload);
         }
     }
     os << "[" << resp.Code << "]: " << payloadStr;
