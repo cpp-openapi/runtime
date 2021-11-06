@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <iostream>
 #include <string>
 
@@ -13,12 +12,11 @@ std::ostream& WriteResponseToStream(std::ostream& os, const R & resp)
     if constexpr (!std::is_same<decltype(resp.Payload), EmptyPayload>::value
         &&  !std::is_same<U, EmptyPayload>::value)
     {
-        std::shared_ptr<Json> j = TypeFactory::NewJson();
         if(resp.Payload.has_value())
         {
-            Json::ToJson(j, resp.Payload.value());
+            Json j = Json::Serialize(resp.Payload.value());
+            payloadStr = j.ToString();
         }
-        payloadStr = j->ToString();
     }
     os << "[" << resp.Code << "]: " << payloadStr;
     return os;

@@ -13,10 +13,11 @@ typedef RapidJson2 Json;
 typedef NlohmannJson2 Json;
 #endif
 
-const char * personJson = R"(
+const char *personJson = R"(
     {
         "name": "John",
         "age" : 10,
+        "optional_id": "xyz",
         "address" : [
             {
                 "state" : "CA",
@@ -44,33 +45,38 @@ struct Address
 {
     std::string state;
     std::string city;
-    OPENAPI_SERILIZATION_FUNCS(state, city)
+    OPENAPI_SERILIZATION_FUNCS_DECLARE
 };
+OPENAPI_SERILIZATION_FUNCS(Address, state, city)
 
 struct Company
 {
     std::string name;
     std::shared_ptr<Address> location;
-    OPENAPI_SERILIZATION_FUNCS(name, location)
+    OPENAPI_SERILIZATION_FUNCS_DECLARE
 };
+OPENAPI_SERILIZATION_FUNCS(Company, name, location)
 
 struct Order
 {
     int id;
-    OPENAPI_SERILIZATION_FUNCS(id)
+    OPENAPI_SERILIZATION_FUNCS_DECLARE
 };
+OPENAPI_SERILIZATION_FUNCS(Order, id)
 
 struct Person
 {
     std::string name;
     int age;
+    std::optional<std::string> optional_id;
     std::vector<Address> address;
     Company company;
     std::vector<int> project_ids;
     std::vector<std::string> project_names;
     std::vector<std::shared_ptr<Order>> orders;
-    OPENAPI_SERILIZATION_FUNCS(name, age, address, company, project_ids, project_names, orders)
+    OPENAPI_SERILIZATION_FUNCS_DECLARE
 };
+OPENAPI_SERILIZATION_FUNCS(Person, name, age, optional_id, address, company, project_ids, project_names, orders)
 
 TEST(Json, Deserialize)
 {
@@ -82,17 +88,17 @@ TEST(Json, Deserialize)
 
     ASSERT_EQ("John", p.name);
     ASSERT_EQ(p.age, 10);
-    //ASSERT_TRUE(false);
+    
+    ASSERT_TRUE(p.optional_id.has_value());
+    ASSERT_EQ("xyz", p.optional_id.value());
 
     ASSERT_EQ(2, p.address.size());
     Address expectAddr1 = {
         "CA",
-        "Los Angeles"
-    };
+        "Los Angeles"};
     Address expectAddr2 = {
         "WA",
-        "Seattle"
-    };
+        "Seattle"};
 
     Address actualAddr1 = p.address[0];
     Address actualAddr2 = p.address[1];
@@ -108,22 +114,22 @@ TEST(Json, Deserialize)
     ASSERT_EQ("Portland", p.company.location->city);
 
     ASSERT_EQ(3, p.project_ids.size());
-    std::vector<int> expected_project_ids = {1,2,3};
-    for(int i = 0; i < expected_project_ids.size(); i++)
+    std::vector<int> expected_project_ids = {1, 2, 3};
+    for (int i = 0; i < expected_project_ids.size(); i++)
     {
-        ASSERT_EQ(expected_project_ids[i],p.project_ids[i]);
+        ASSERT_EQ(expected_project_ids[i], p.project_ids[i]);
     }
 
     ASSERT_EQ(2, p.project_names.size());
-    std::vector<std::string> expected_project_names = {"project1","project2"};
-    for(int i = 0; i < expected_project_names.size(); i++)
+    std::vector<std::string> expected_project_names = {"project1", "project2"};
+    for (int i = 0; i < expected_project_names.size(); i++)
     {
-        ASSERT_EQ(expected_project_names[i],p.project_names[i]);
+        ASSERT_EQ(expected_project_names[i], p.project_names[i]);
     }
 
-    ASSERT_EQ(2,p.orders.size());
-    ASSERT_EQ(11,p.orders[0]->id);
-    ASSERT_EQ(12,p.orders[1]->id);
+    ASSERT_EQ(2, p.orders.size());
+    ASSERT_EQ(11, p.orders[0]->id);
+    ASSERT_EQ(12, p.orders[1]->id);
 }
 
 TEST(Json, Serialize)
@@ -132,30 +138,28 @@ TEST(Json, Serialize)
     p.name = "John";
     p.age = 10;
     p.address = {
-        {"CA","Los Angeles"},
-        {"WA", "Seattle"}
-    };
+        {"CA", "Los Angeles"},
+        {"WA", "Seattle"}};
 
-//     "name" : "Costco",
-//     "location" : {
-//         "state" : "OR",
-//         "city" : "Portland"
-//     }
+    //     "name" : "Costco",
+    //     "location" : {
+    //         "state" : "OR",
+    //         "city" : "Portland"
+    //     }
     p.company.name = "Costco";
     p.company.location = std::make_shared<Address>();
     p.company.location->state = "OR";
     p.company.location->city = "Portland";
 
-//  "project_ids" : [1,2,3],
-//  "project_names" : ["project1","project2"],
-    p.project_ids = {1,2,3};
-    p.project_names = {"project1","project2"};
+    //  "project_ids" : [1,2,3],
+    //  "project_names" : ["project1","project2"],
+    p.project_ids = {1, 2, 3};
+    p.project_names = {"project1", "project2"};
 
-// "orders" : [{"id":11},{"id":12}]
+    // "orders" : [{"id":11},{"id":12}]
     p.orders = {std::make_shared<Order>(), std::make_shared<Order>()};
     p.orders[0]->id = 11;
     p.orders[1]->id = 12;
-
 
     Json j = p.SerializeJSON();
 
@@ -181,8 +185,8 @@ TEST(Json, Serialize)
     ASSERT_EQ(p.project_names, j.GetMember<std::vector<std::string>>("project_names"));
 
     // orders
-    std::vector<std::shared_ptr<Order>> & orderExpected = p.orders;
-    std::vector<std::shared_ptr<Order>> ordersResult =  j.GetMember<std::vector<std::shared_ptr<Order>>>("orders");
+    std::vector<std::shared_ptr<Order>> &orderExpected = p.orders;
+    std::vector<std::shared_ptr<Order>> ordersResult = j.GetMember<std::vector<std::shared_ptr<Order>>>("orders");
     ASSERT_EQ(orderExpected.size(), ordersResult.size());
     ASSERT_EQ(orderExpected[0]->id, ordersResult[0]->id);
     ASSERT_EQ(orderExpected[1]->id, ordersResult[1]->id);

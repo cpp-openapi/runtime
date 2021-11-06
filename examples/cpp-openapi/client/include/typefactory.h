@@ -1,10 +1,9 @@
 #pragma once
-#include "jsonopenapi.h"
+// #include "jsonopenapi.h"
 #include "client.h"
 
 class TypeFactory
 {
 public:
-    static std::shared_ptr<Json> NewJson();
     static std::shared_ptr<IClient> NewClient(ClientConfig cfg);
 };

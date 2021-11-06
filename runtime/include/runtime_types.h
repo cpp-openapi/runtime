@@ -17,6 +17,9 @@ struct remove_optional<std::optional<T>>
     typedef typename remove_optional<T>::type type;
 };
 
+// is optional
+template<typename T> struct is_optional : std::false_type {};
+template<typename T> struct is_optional<std::optional<T>> : std::true_type {};
 
 // is shared ptr
 template<typename T> struct is_shared_ptr : std::false_type {};

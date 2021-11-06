@@ -15,7 +15,10 @@ public:
     bool HasKey(const std::string &key) const;
 
 
-    std::string ToString();
+    std::string ToString() const;
+
+    template<typename T>
+    static NlohmannJson2 Serialize(T val);
 
     template<typename T>
     T Get() const;
@@ -35,14 +38,27 @@ private:
     nlohmann::json _j;
 };
 
+template<typename T>
+NlohmannJson2 NlohmannJson2::Serialize(T val)
+{
+    NlohmannJson2 j;
+    j.Set(val);
+    return j;
+}
 
 // T is primitive or vector or deserializable
 template<typename T>
 T NlohmannJson2::Get() const
 {
     T i;
+    if constexpr (is_optional<T>::value)
+    {
+        // For optional, get the inner type
+        using V = typename remove_optional<T>::type;
+        i = this->Get<V>();
+    }
     // handle primitive types
-    if constexpr (std::is_same<T, int>::value || std::is_same<T, std::string>::value) 
+    else if constexpr (std::is_same<T, int>::value || std::is_same<T, std::string>::value) 
     {
         this->_j.get_to<T>(i);       
     }
@@ -93,7 +109,15 @@ T NlohmannJson2::GetMember(const std::string &key) const
 template<typename T>
 void NlohmannJson2::Set(T val)
 {
-    if constexpr (std::is_same<T, int>::value 
+    if constexpr(is_optional<T>::value)
+    {
+        if(val.has_value()){
+            using V = typename remove_optional<T>::type;
+            this->Set<V>(val.value());
+        }
+        // TODO: set null?
+    }
+    else if constexpr (std::is_same<T, int>::value 
         || std::is_same<T, std::string>::value) 
     {
         this->_j = val;     

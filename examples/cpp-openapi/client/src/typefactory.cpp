@@ -5,11 +5,11 @@
 #include "beastclient.h"
 #include "curlppclient.h"
 
-std::shared_ptr<Json> TypeFactory::NewJson()
-{
-    return std::make_shared<NlohmannJson>();
-    //return std::make_shared<RapidJson>();
-}
+// std::shared_ptr<Json> TypeFactory::NewJson()
+// {
+//     return std::make_shared<NlohmannJson>();
+//     //return std::make_shared<RapidJson>();
+// }
 
 std::shared_ptr<IClient> TypeFactory::NewClient(ClientConfig cfg)
 {

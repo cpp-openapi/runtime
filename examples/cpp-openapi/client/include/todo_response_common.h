@@ -18,8 +18,8 @@ void ReadResponseCommon(R &res, std::shared_ptr<IOASClientResponse> resp)
         if (body.size() == 0){
             return;
         }
-        std::shared_ptr<Json> j = TypeFactory::NewJson();
-        j->Parse(body);
-        res.Payload = Json::Get<U>(j);
+        Json j;
+        j.Parse(body);
+        res.Payload = j.Get<U>();
     }
 }

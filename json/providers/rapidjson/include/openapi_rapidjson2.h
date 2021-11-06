@@ -4,6 +4,7 @@
 #include "rapidjson/document.h"
 #include <memory>
 #include <string>
+#include <stdexcept>
 
 class RapidJson2
 {
@@ -14,7 +15,10 @@ public:
 
     bool HasKey(const std::string &key) const;
 
-    std::string ToString();
+    std::string ToString() const;
+
+    template<typename T>
+    static RapidJson2 Serialize(T val);
 
     template<typename T>
     T Get() const;
@@ -34,11 +38,25 @@ private:
 };
 
 template<typename T>
+RapidJson2 RapidJson2::Serialize(T val)
+{
+    RapidJson2 j;
+    j.Set(val);
+    return j;
+}
+
+template<typename T>
 T RapidJson2::Get() const
 {
     T i;
+    if constexpr (is_optional<T>::value)
+    {
+        // For optional, get the inner type
+        using V = typename remove_optional<T>::type;
+        i = this->Get<V>();
+    }
     // handle primitive types
-    if constexpr (std::is_same<T, int>::value) 
+    else if constexpr (std::is_same<T, int>::value) 
     {
         if(!this->_j.IsInt()){
             throw new std::invalid_argument("not integer");
@@ -100,7 +118,15 @@ T RapidJson2::GetMember(const std::string &key) const
 template<typename T>
 void RapidJson2::Set(T val)
 {
-    if constexpr (std::is_same<T, int>::value) 
+    if constexpr(is_optional<T>::value)
+    {
+        if(val.has_value()){
+            using V = typename remove_optional<T>::type;
+            this->Set<V>(val.value());
+        }
+        // TODO: set null?
+    }
+    else if constexpr (std::is_same<T, int>::value) 
     {
         this->_j.SetInt(val);
     }
@@ -147,7 +173,7 @@ void RapidJson2::AddMember(const std::string &key, T val)
     name.SetString(key.c_str(),static_cast<rapidjson::SizeType>(key.size()),_j.GetAllocator());
     
     RapidJson2 jVal;
-    jVal.Set(val);
+    jVal.Set<T>(val);
     rapidjson::Value copy(jVal._j, this->_j.GetAllocator());
 
     // if type is not initilized, member will not be added

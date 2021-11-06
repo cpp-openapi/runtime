@@ -1,5 +1,5 @@
 #include "add_one_params.h"
-#include "typefactory.h"
+// #include "typefactory.h"
 #include "todo_params_common.h"
 
 std::string const AddOneParams::ContentType = "application/io.goswagger.examples.todo-list.v1+json";
@@ -12,8 +12,7 @@ void AddOneParams::WriteParams(std::shared_ptr<IOASClientRequest> req) const
 
     if (this->Body.has_value())
     {
-        std::shared_ptr<Json> j = TypeFactory::NewJson();
-        Json::ToJson(j, this->Body.value());
-        req->SetBodyParam(j->ToString());
+        const Json j = this->Body->SerializeJSON();
+        req->SetBodyParam(j.ToString());
     }
 }

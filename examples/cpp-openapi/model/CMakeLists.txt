@@ -11,3 +11,7 @@ target_include_directories(
 target_link_libraries(todo-list-model
     PUBLIC cpp-openapi-json
 )
+
+target_link_libraries(todo-list-model
+    PUBLIC todo-list-common
+)

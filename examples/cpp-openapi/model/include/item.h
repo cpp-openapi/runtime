@@ -1,9 +1,10 @@
 #pragma once
 
 #include <string>
-#include <jsonopenapi.h>
+// #include <jsonopenapi.h>
 #include <memory>
 #include <optional>
+#include "settings.h"
 
 class Item
 {
@@ -11,7 +12,5 @@ public:
     std::optional<int> id;
     std::optional<std::string> description;
     std::optional<bool> completed;
-
-    void SerializeJSON(std::shared_ptr<Json> j) const;
-    void DeserializeJSON(std::shared_ptr<Json> j);
+    OPENAPI_SERILIZATION_FUNCS_DECLARE
 };

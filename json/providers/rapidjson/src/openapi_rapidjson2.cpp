@@ -12,7 +12,7 @@ bool RapidJson2::HasKey(const std::string &key) const
     return this->_j.HasMember(key.c_str());
 }
 
-std::string RapidJson2::ToString()
+std::string RapidJson2::ToString() const
 {
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);

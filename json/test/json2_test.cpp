@@ -4,6 +4,8 @@
 #include <nlohmann/json.hpp> // for raw json compare
 #include <memory>
 
+#include "runtime_types.h"
+
 #include "openapi_json_macro.h"
 
 #ifdef OPENAPI_RAPIDJSON
@@ -43,15 +45,16 @@ TEST(Json2, GetArray)
     }
 }
 
+struct Book
+{
+    std::string title;
+    int pages;
+    OPENAPI_SERILIZATION_FUNCS_DECLARE
+};
+OPENAPI_SERILIZATION_FUNCS(Book, title, pages)
+
 TEST(Json2, GetAndSetStruct)
 {
-    struct Book
-    {
-        std::string title;
-        int pages;
-        OPENAPI_SERILIZATION_FUNCS(title, pages)
-    };
-
     Json x;
     x.Parse(R"(
         {

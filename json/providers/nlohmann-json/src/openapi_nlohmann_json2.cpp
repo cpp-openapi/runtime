@@ -10,6 +10,6 @@ void NlohmannJson2::Parse(const std::string &data)
     this->_j = nlohmann::json::parse(data);
 }
 
-std::string NlohmannJson2::ToString(){
+std::string NlohmannJson2::ToString() const{
     return this->_j.dump();
 }

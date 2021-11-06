@@ -12,6 +12,24 @@ add_subdirectory(runtime)
 
 add_subdirectory(client)
 
+# json option
+set(OPENAPI_JSON "OPENAPI_NLOHMANNJSON" CACHE STRING "Json provider choosen")
+set_property(CACHE OPENAPI_JSON PROPERTY STRINGS "OPENAPI_NLOHMANNJSON" "OPENAPI_RAPIDJSON")
+
+message("Using OPENAPI_JSON = " ${OPENAPI_JSON})
+# validate 
+get_property(OPT_STRINGS CACHE OPENAPI_JSON PROPERTY STRINGS)
+if (NOT OPENAPI_JSON IN_LIST OPT_STRINGS)
+  message(FATAL_ERROR "Wrong value of the parameter 'OPENAPI_JSON'")
+endif()
+
+# TODO
+if(OPENAPI_JSON STREQUAL  "OPENAPI_NLOHMANNJSON")
+
+elseif(OPENAPI_JSON STREQUAL  "OPENAPI_RAPIDJSON")
+
+endif()
+
 add_subdirectory(json)
 
 add_subdirectory(examples)
