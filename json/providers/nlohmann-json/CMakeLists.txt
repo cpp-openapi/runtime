@@ -18,15 +18,13 @@ file(GLOB SOURCES
     src/*.cpp
 )
 
-project(cpp-openapi-json-nlohmann)
-
-add_library(cpp-openapi-json-nlohmann STATIC "${cxx_strict}" 
+add_library(openapi_nlohmann_json STATIC "${cxx_strict}" 
 ${SOURCES})
 
 target_include_directories(
-    cpp-openapi-json-nlohmann
+    openapi_nlohmann_json
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(cpp-openapi-json-nlohmann PUBLIC cpp-openapi-json)
-target_link_libraries(cpp-openapi-json-nlohmann PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(openapi_nlohmann_json PUBLIC openapi_json)
+target_link_libraries(openapi_nlohmann_json PUBLIC nlohmann_json::nlohmann_json)

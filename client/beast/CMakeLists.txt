@@ -14,17 +14,15 @@ file(GLOB SOURCES
     src/*.cpp
 )
 
-project(cpp-openapi-client-beast)
-
-add_library(cpp-openapi-client-beast STATIC "${cxx_strict}" 
+add_library(openapi_client_beast STATIC "${cxx_strict}" 
 # ${Boost_LIBRARIES} 
 ${SOURCES})
 
 target_include_directories(
-    cpp-openapi-client-beast
+    openapi_client_beast
     PUBLIC
     ${Boost_INCLUDE_DIR}
-    ${cpp-openapi-client-beast_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 # get_property(dirs DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY INCLUDE_DIRECTORIES)
@@ -32,7 +30,7 @@ target_include_directories(
 #   message(STATUS "dir='${dir}'")
 # endforeach()
 
-target_link_libraries(cpp-openapi-client-beast 
+target_link_libraries(openapi_client_beast 
 # PRIVATE ${Boost_LIBRARIES} 
-PRIVATE cpp-openapi-runtime
+    PRIVATE openapi_runtime
 )

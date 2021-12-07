@@ -10,8 +10,9 @@ add_executable("main" main.cpp)
 #   main
 # #  PUBLIC ${Boost_INCLUDE_DIR}
 # )
-target_link_libraries("main" PRIVATE todo-list-client
-PUBLIC cpp-openapi-runtime # for auth
+target_link_libraries("main"
+    PRIVATE todo_list_client
+    PUBLIC openapi_runtime # for auth
 # PUBLIC pthread dl
 # PUBLIC ${Boost_LIBRARIES} # for stacktrace
 )

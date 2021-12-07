@@ -38,16 +38,14 @@ file(GLOB SOURCES
     src/*.cpp
 )
 
-project(cpp-openapi-client-curlpp)
-
-add_library(cpp-openapi-client-curlpp STATIC "${cxx_strict}" 
+add_library(openapi_client_curlpp STATIC "${cxx_strict}" 
 ${SOURCES})
 
 target_include_directories(
-    cpp-openapi-client-curlpp
+    openapi_client_curlpp
     PUBLIC
-    ${cpp-openapi-client-curlpp_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
     "${curlpp_SOURCE_DIR}/include"
 )
 
-target_link_libraries(cpp-openapi-client-curlpp PRIVATE cpp-openapi-runtime curlpp_static)
+target_link_libraries(openapi_client_curlpp PRIVATE openapi_runtime curlpp_static)

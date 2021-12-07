@@ -2,19 +2,21 @@ cmake_minimum_required(VERSION 3.14)
 
 set (CMAKE_CXX_STANDARD 17)
 
-project(cpp-openapi-runtime)
-
 file(GLOB SOURCES
     include/*.h
     src/*.cpp
 )
 
-add_library(cpp-openapi-runtime STATIC "${cxx_strict}" 
+add_library(openapi_runtime STATIC 
     ${SOURCES}
 )
 
 target_include_directories(
-    cpp-openapi-runtime
+    openapi_runtime
     PUBLIC
-    ${cpp-openapi-runtime_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
+if(OPENAPI_BuildTests)
+    add_subdirectory(test)
+endif()

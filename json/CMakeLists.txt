@@ -3,18 +3,20 @@ file(GLOB SOURCES
     src/*.cpp
 )
 
-project(cpp-openapi-json)
-
 add_subdirectory(providers)
 
-add_library(cpp-openapi-json STATIC "${cxx_strict}"
+add_library(openapi_json STATIC
 ${SOURCES})
 
 target_include_directories(
-    cpp-openapi-json
-    PUBLIC ${cpp-openapi-json_SOURCE_DIR}/include
+    openapi_json
+    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
+
 # for shared types
-target_link_libraries(cpp-openapi-json PUBLIC cpp-openapi-runtime)
+target_link_libraries(openapi_json PUBLIC openapi_runtime)
 
 # tests are added in top dir
+if(OPENAPI_BuildTests)
+    add_subdirectory(test)
+endif()
