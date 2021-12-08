@@ -16,14 +16,15 @@ file(GLOB SOURCES
     src/*.cpp
 )
 
-add_library(openapi_rapidjson STATIC "${cxx_strict}" 
-${SOURCES})
+add_library(openapi_rapidjson
+  STATIC  ${SOURCES}
+)
 
-target_include_directories(
-  openapi_rapidjson
+target_include_directories(openapi_rapidjson
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
   PUBLIC ${RapidJSON_SOURCE_DIR}/include
 )
 
-target_link_libraries(openapi_rapidjson PUBLIC openapi_json)
-# target_link_libraries(cpp-openapi-rapidjson INTERFACE RapidJSON)
+target_link_libraries(openapi_rapidjson 
+  PUBLIC openapi_json
+)

@@ -4,9 +4,7 @@ file(GLOB SOURCES
 )
 
 # strip file extension
-#message("sources are  " ${SOURCES})
 foreach(test_file ${SOURCES})
-    #message("test file is " ${test_file} "bindir " ${CMAKE_BINARY_DIR})
     get_filename_component(test_name ${test_file} NAME_WE)
     add_executable(${test_name} ${test_file})
     

@@ -11,20 +11,20 @@ if(NOT json_POPULATED)
 endif()
 # json dep end
 
-# target_link_libraries(foo PRIVATE nlohmann_json::nlohmann_json)
-
 file(GLOB SOURCES
     include/*.h
     src/*.cpp
 )
 
-add_library(openapi_nlohmann_json STATIC "${cxx_strict}" 
-${SOURCES})
+add_library(openapi_nlohmann_json
+  STATIC ${SOURCES})
 
 target_include_directories(
-    openapi_nlohmann_json
-    PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+  openapi_nlohmann_json
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
-target_link_libraries(openapi_nlohmann_json PUBLIC openapi_json)
-target_link_libraries(openapi_nlohmann_json PUBLIC nlohmann_json::nlohmann_json)
+target_link_libraries(openapi_nlohmann_json
+  PUBLIC openapi_json
+  PUBLIC nlohmann_json::nlohmann_json
+)

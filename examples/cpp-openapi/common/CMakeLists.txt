@@ -3,9 +3,11 @@ file(GLOB SOURCES
     src/*.cpp
 )
 
-add_library(todo_list_common STATIC "${cxx_strict}" ${SOURCES})
-target_include_directories(
-    todo_list_common
+add_library(todo_list_common
+    STATIC ${SOURCES}
+)
+
+target_include_directories(todo_list_common
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 

@@ -6,7 +6,9 @@
 # set(BOOST_ROOT "C:\\local\\boost_1_76_0")
 
 set(Boost_USE_STATIC_LIBS ON)
-# ADD_DEFINITIONS("-DBOOST_ALL_NO_LIB")
+
+# we use header only
+ADD_DEFINITIONS("-DBOOST_ALL_NO_LIB")
 find_package(Boost REQUIRED)
 
 file(GLOB SOURCES

@@ -32,6 +32,17 @@ if (NOT OPENAPI_JSON IN_LIST OPT_STRINGS)
   message(FATAL_ERROR "Wrong value of the parameter 'OPENAPI_JSON'")
 endif()
 
+# client option
+set(OPENAPI_CLIENT "OPENAPI_CLIENT_CURLPP" CACHE STRING "Client provider choosen")
+set_property(CACHE OPENAPI_CLIENT PROPERTY STRINGS "OPENAPI_CLIENT_CURLPP" "OPENAPI_CLIENT_BREAST")
+
+message("Using OPENAPI_CLIENT = " ${OPENAPI_CLIENT})
+# validate 
+get_property(OPENAPI_CLIENT_OPT_STRINGS CACHE OPENAPI_CLIENT PROPERTY STRINGS)
+if (NOT OPENAPI_CLIENT IN_LIST OPENAPI_CLIENT_OPT_STRINGS)
+  message(FATAL_ERROR "Wrong value of the parameter 'OPENAPI_CLIENT'")
+endif()
+
 if(OPENAPI_BuildTests)
   # import google test
   include(FetchContent)

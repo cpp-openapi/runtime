@@ -5,18 +5,19 @@ file(GLOB SOURCES
 
 add_subdirectory(providers)
 
-add_library(openapi_json STATIC
-${SOURCES})
+add_library(openapi_json
+    STATIC  ${SOURCES}
+)
 
-target_include_directories(
-    openapi_json
+target_include_directories(openapi_json
     PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
 # for shared types
-target_link_libraries(openapi_json PUBLIC openapi_runtime)
+target_link_libraries(openapi_json
+    PUBLIC openapi_runtime
+)
 
-# tests are added in top dir
 if(OPENAPI_BuildTests)
     add_subdirectory(test)
 endif()
