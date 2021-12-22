@@ -38,36 +38,36 @@
     OPENAPI_CALL_WITH_ARG_1,\
     OPENAPI_CALL_WITH_ARG_0)(f,__VA_ARGS__))
 
-#define OPENAPI_SERIALIZE_MEMBER(arg1) \
+#define OPENAPI_TO_JSON_MEMBER(arg1) \
 { \
     j.AddMember<decltype(this->arg1)>(#arg1, arg1);\
 }
 
-#define OPENAPI_DESRIALIZE_MEMBER(arg1) \
+#define OPENAPI_FROM_JSON_MEMBER(arg1) \
     if(j.HasKey(#arg1)) \
     { \
         using V = remove_optional<decltype(this->arg1)>::type;\
         this->arg1 = j.GetMember<V>(#arg1); \
     }
 
-#define OPENAPI_SERIALIZE_FUNC(arg1, ...) \
-    Json arg1::SerializeJSON() const\
+#define OPENAPI_TO_JSON_FUNC(arg1, ...) \
+    void arg1::ToJSON(Json & j) const \
     { \
-        Json j; \
-        OPENAPI_FOR_EACH(OPENAPI_SERIALIZE_MEMBER, __VA_ARGS__) \
-        return j; \
+        OPENAPI_FOR_EACH(OPENAPI_TO_JSON_MEMBER, __VA_ARGS__) \
     }
 
-#define OPENAPI_DESERIALIZE_FUNC(arg1, ...) \
-    void arg1::DeserializeJSON(const Json & j) \
+#define OPENAPI_FROM_JSON_FUNC(arg1, ...) \
+    void arg1::FromJSON(const Json & j) \
     { \
-        OPENAPI_FOR_EACH(OPENAPI_DESRIALIZE_MEMBER, __VA_ARGS__) \
+        OPENAPI_FOR_EACH(OPENAPI_FROM_JSON_MEMBER, __VA_ARGS__) \
     }
 
-#define OPENAPI_SERILIZATION_FUNCS(arg1, ...) \
-    OPENAPI_SERIALIZE_FUNC(arg1, __VA_ARGS__) \
-    OPENAPI_DESERIALIZE_FUNC(arg1, __VA_ARGS__)
+#define OPENAP_JSON_CONVERT_FUNCS(arg1, ...) \
+    OPENAPI_TO_JSON_FUNC(arg1, __VA_ARGS__) \
+    OPENAPI_FROM_JSON_FUNC(arg1, __VA_ARGS__)
 
-#define OPENAPI_SERILIZATION_FUNCS_DECLARE \
-    Json SerializeJSON() const; \
-    void DeserializeJSON(const Json & j);
+#define OPENAPI_JSON_CONVERT_FUNCS_DECLARE \
+    void ToJSON(Json & j) const; \
+    void FromJSON(const Json & j); 
+
+

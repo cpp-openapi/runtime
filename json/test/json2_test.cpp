@@ -49,9 +49,9 @@ struct Book
 {
     std::string title;
     int pages;
-    OPENAPI_SERILIZATION_FUNCS_DECLARE
+    OPENAPI_JSON_CONVERT_FUNCS_DECLARE
 };
-OPENAPI_SERILIZATION_FUNCS(Book, title, pages)
+OPENAP_JSON_CONVERT_FUNCS(Book, title, pages)
 
 TEST(Json2, GetAndSetStruct)
 {

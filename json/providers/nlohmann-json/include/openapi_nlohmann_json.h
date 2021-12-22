@@ -93,9 +93,9 @@ T NlohmannJson::Get() const
         {
             using U = typename remove_shared_ptr<T>::type;
             i = std::make_shared<U>();
-            i->DeserializeJSON(*this);
+            i->FromJSON(*this);
         }else{
-            i.DeserializeJSON(*this);
+            i.FromJSON(*this);
         }
     }
     return i;
@@ -150,11 +150,15 @@ void NlohmannJson::Set(T val)
         // TODO:
         if constexpr (is_shared_ptr<T>::value == true)
         {
-            this->_j = val->SerializeJSON()._j;
+            NlohmannJson i;
+            val->ToJSON(i);
+            this->_j = i._j;
         }
         else
         {
-            this->_j = val.SerializeJSON()._j;
+            NlohmannJson i;
+            val.ToJSON(i);
+            this->_j = i._j;
         }
     }
 }

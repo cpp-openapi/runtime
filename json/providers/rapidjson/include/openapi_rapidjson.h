@@ -104,9 +104,9 @@ T RapidJson::Get() const
         {
             using U = typename remove_shared_ptr<T>::type;
             i = std::make_shared<U>();
-            i->DeserializeJSON(*this);
+            i->FromJSON(*this);
         }else{
-            i.DeserializeJSON(*this);
+            i.FromJSON(*this);
         }
     }
     return i;
@@ -168,11 +168,15 @@ void RapidJson::Set(T val)
     {
         if constexpr (is_shared_ptr<T>::value == true)
         {
-            this->_j.CopyFrom(val->SerializeJSON()._j, this->_j.GetAllocator());
+            RapidJson i;
+            val->ToJSON(i);
+            this->_j.CopyFrom(i._j, this->_j.GetAllocator());
         }
         else
         {
-            this->_j.CopyFrom(val.SerializeJSON()._j, this->_j.GetAllocator());
+            RapidJson i;
+            val.ToJSON(i);
+            this->_j.CopyFrom(i._j, this->_j.GetAllocator());
         }
     }
 }

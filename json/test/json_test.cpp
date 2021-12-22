@@ -45,24 +45,24 @@ struct Address
 {
     std::string state;
     std::string city;
-    OPENAPI_SERILIZATION_FUNCS_DECLARE
+    OPENAPI_JSON_CONVERT_FUNCS_DECLARE
 };
-OPENAPI_SERILIZATION_FUNCS(Address, state, city)
+OPENAP_JSON_CONVERT_FUNCS(Address, state, city)
 
 struct Company
 {
     std::string name;
     std::shared_ptr<Address> location;
-    OPENAPI_SERILIZATION_FUNCS_DECLARE
+    OPENAPI_JSON_CONVERT_FUNCS_DECLARE
 };
-OPENAPI_SERILIZATION_FUNCS(Company, name, location)
+OPENAP_JSON_CONVERT_FUNCS(Company, name, location)
 
 struct Order
 {
     int id;
-    OPENAPI_SERILIZATION_FUNCS_DECLARE
+    OPENAPI_JSON_CONVERT_FUNCS_DECLARE
 };
-OPENAPI_SERILIZATION_FUNCS(Order, id)
+OPENAP_JSON_CONVERT_FUNCS(Order, id)
 
 struct Person
 {
@@ -74,9 +74,9 @@ struct Person
     std::vector<int> project_ids;
     std::vector<std::string> project_names;
     std::vector<std::shared_ptr<Order>> orders;
-    OPENAPI_SERILIZATION_FUNCS_DECLARE
+    OPENAPI_JSON_CONVERT_FUNCS_DECLARE
 };
-OPENAPI_SERILIZATION_FUNCS(Person, name, age, optional_id, address, company, project_ids, project_names, orders)
+OPENAP_JSON_CONVERT_FUNCS(Person, name, age, optional_id, address, company, project_ids, project_names, orders)
 
 TEST(Json, Deserialize)
 {
@@ -84,7 +84,7 @@ TEST(Json, Deserialize)
     j.Parse(personJson);
 
     Person p;
-    p.DeserializeJSON(j);
+    p.FromJSON(j);
 
     ASSERT_EQ("John", p.name);
     ASSERT_EQ(p.age, 10);
@@ -161,7 +161,8 @@ TEST(Json, Serialize)
     p.orders[0]->id = 11;
     p.orders[1]->id = 12;
 
-    Json j = p.SerializeJSON();
+    Json j;
+    p.ToJSON(j);
 
     ASSERT_EQ(p.name, j.GetMember<std::string>("name"));
     ASSERT_EQ(p.age, j.GetMember<int>("age"));
@@ -197,9 +198,10 @@ TEST(Json, deserialize_identity)
     Json j;
     j.Parse(personJson);
     Person p;
-    p.DeserializeJSON(j);
+    p.FromJSON(j);
 
-    Json j2 = p.SerializeJSON();
+    Json j2;
+    p.ToJSON(j2);
 
     nlohmann::json jExpect = nlohmann::json::parse(personJson);
     nlohmann::json jResult = nlohmann::json::parse(j2.ToString());

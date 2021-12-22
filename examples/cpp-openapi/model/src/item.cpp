@@ -1,3 +1,3 @@
 #include "item.h"
 
-OPENAPI_SERILIZATION_FUNCS(Item, id, description)
+OPENAP_JSON_CONVERT_FUNCS(Item, id, description)

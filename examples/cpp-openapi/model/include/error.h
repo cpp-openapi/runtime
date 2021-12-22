@@ -10,5 +10,5 @@ class Error
 public:
     std::optional<int> code;
     std::optional<std::string> message;
-    OPENAPI_SERILIZATION_FUNCS_DECLARE
+    OPENAPI_JSON_CONVERT_FUNCS_DECLARE
 };
