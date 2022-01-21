@@ -43,6 +43,9 @@ if (NOT OPENAPI_CLIENT IN_LIST OPENAPI_CLIENT_OPT_STRINGS)
   message(FATAL_ERROR "Wrong value of the parameter 'OPENAPI_CLIENT'")
 endif()
 
+# utf16 option
+set(OPENAPI_UTF16_STRINGS "Use wchar type for string_t" ON)
+
 if(OPENAPI_BuildTests)
   # import google test
   include(FetchContent)

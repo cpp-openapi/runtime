@@ -8,6 +8,8 @@
 
 #include "openapi_json_macro.h"
 
+#include "strconv.h"
+
 #ifdef OPENAPI_RAPIDJSON
 #include "openapi_rapidjson.h"
 typedef RapidJson Json;
@@ -19,23 +21,23 @@ typedef NlohmannJson Json;
 TEST(Json2, GetInt)
 {
     Json x;
-    x.Parse(R"(
+    x.Parse(openapi::StringT(R"(
         {
             "str" : "str_val",
             "int" : 1
         }
-    )");
+    )"));
 
-    ASSERT_EQ(1, x.GetMember<int>("int"));
-    ASSERT_EQ("str_val", x.GetMember<std::string>("str"));
+    ASSERT_EQ(1, x.GetMember<int>(openapi::StringT("int")));
+    ASSERT_EQ(openapi::StringT("str_val"), x.GetMember<openapi::string_t>(openapi::StringT("str")));
 }
 
 TEST(Json2, GetArray)
 {
     Json x;
-    x.Parse(R"(
+    x.Parse(openapi::StringT(R"(
         [1,2,3]
-        )");
+        )"));
     std::vector<int> nums = x.Get<std::vector<int>>();
     std::vector<int> expect = {1,2,3};
     ASSERT_EQ(expect.size(), nums.size());
@@ -47,7 +49,7 @@ TEST(Json2, GetArray)
 
 struct Book
 {
-    std::string title;
+    openapi::string_t title;
     int pages;
     OPENAPI_JSON_CONVERT_FUNCS_DECLARE
 };
@@ -56,15 +58,15 @@ OPENAP_JSON_CONVERT_FUNCS(Book, title, pages)
 TEST(Json2, GetAndSetStruct)
 {
     Json x;
-    x.Parse(R"(
+    x.Parse(openapi::StringT(R"(
         {
             "title" : "MyTitle",
             "pages" : 10
         }
-    )");
+    )"));
 
     Book b = x.Get<Book>();
-    ASSERT_EQ("MyTitle", b.title);
+    ASSERT_EQ(openapi::StringT("MyTitle"), b.title);
     ASSERT_EQ(10, b.pages);
 
     // serrialize back
@@ -95,9 +97,9 @@ TEST(Json2, SetArrayMember)
     Json x;
     std::vector<int> expect = {1,2,3};
 
-    x.AddMember("array",expect);
+    x.AddMember(openapi::StringT("array"),expect);
     
-    std::vector<int> nums = x.GetMember<std::vector<int>>("array");
+    std::vector<int> nums = x.GetMember<std::vector<int>>(openapi::StringT("array"));
     for(int i = 0; i < expect.size(); i++)
     {
         ASSERT_EQ(expect[i],nums[i]);

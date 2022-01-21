@@ -1,6 +1,7 @@
 #pragma once
 
 #include "runtime_types.h"
+#include "strconv.h"
 #include "rapidjson/document.h"
 #include <memory>
 #include <string>
@@ -11,26 +12,26 @@ class RapidJson
 public:
     RapidJson(): _j() { }
 
-    void Parse(const std::string & data);
+    void Parse(const openapi::string_t & data);
 
-    bool HasKey(const std::string &key) const;
+    bool HasKey(const openapi::string_t &key) const;
 
-    std::string ToString() const;
-
-    template<typename T>
-    static std::string Serialize(T val);
+    openapi::string_t ToString() const;
 
     template<typename T>
-    static T Deserialize(const std::string &data);
+    static openapi::string_t Serialize(T val);
+
+    template<typename T>
+    static T Deserialize(const openapi::string_t &data);
 
     template<typename T>
     T Get() const;
     
     template<typename T>
-    T GetMember(const std::string &key) const; // cannot make const?
+    T GetMember(const openapi::string_t &key) const; // cannot make const?
 
     template<typename T>
-    void AddMember(const std::string &key, T val);
+    void AddMember(const openapi::string_t &key, T val);
 
     // set json value, used mainly for array
     template<typename T>
@@ -41,7 +42,7 @@ private:
 };
 
 template<typename T>
-std::string RapidJson::Serialize(T val)
+openapi::string_t RapidJson::Serialize(T val)
 {
     RapidJson j;
     j.Set(val);
@@ -49,7 +50,7 @@ std::string RapidJson::Serialize(T val)
 }
 
 template<typename T>
-T RapidJson::Deserialize(const std::string &data)
+T RapidJson::Deserialize(const openapi::string_t &data)
 {
     RapidJson j;
     j.Parse(data);
@@ -74,12 +75,13 @@ T RapidJson::Get() const
         }
         i = this->_j.GetInt();     
     }
-    else if constexpr (std::is_same<T, std::string>::value)
+    else if constexpr (std::is_same<T, openapi::string_t>::value)
     {
         if(!this->_j.IsString()){
             throw new std::invalid_argument("not string");
         }
-        i = _j.GetString();
+        std::string stdVal = _j.GetString();
+        i = openapi::StringT(stdVal.c_str());
     }
     else if constexpr(is_vector<T>::value)
     {
@@ -113,14 +115,14 @@ T RapidJson::Get() const
 }
 
 template<typename T>
-T RapidJson::GetMember(const std::string &key) const
+T RapidJson::GetMember(const openapi::string_t &key) const
 {
     if (!this->HasKey(key))
     {
         throw new std::invalid_argument("key not found");
     }
 
-    rapidjson::Value const &v = _j[key.c_str()];
+    rapidjson::Value const &v = _j[openapi::ToStdString(key).c_str()];
     RapidJson inner;
     inner._j.CopyFrom(v, inner._j.GetAllocator());
     return inner.Get<T>();
@@ -141,9 +143,10 @@ void RapidJson::Set(T val)
     {
         this->_j.SetInt(val);
     }
-    else if constexpr (std::is_same<T, std::string>::value)
+    else if constexpr (std::is_same<T, openapi::string_t>::value)
     {
-        this->_j.SetString(val.c_str(),static_cast<rapidjson::SizeType>(val.size()),_j.GetAllocator());
+        std::string stdVal = openapi::ToStdString(val);
+        this->_j.SetString(stdVal.c_str(),static_cast<rapidjson::SizeType>(stdVal.size()),_j.GetAllocator());
     }
     else if constexpr(std::is_same<T, RapidJson>::value)
     {
@@ -182,10 +185,11 @@ void RapidJson::Set(T val)
 }
 
 template<typename T>
-void RapidJson::AddMember(const std::string &key, T val)
+void RapidJson::AddMember(const openapi::string_t &key, T val)
 {
     rapidjson::Value name;
-    name.SetString(key.c_str(),static_cast<rapidjson::SizeType>(key.size()),_j.GetAllocator());
+    std::string stdKey = openapi::ToStdString(key);
+    name.SetString(stdKey.c_str(),static_cast<rapidjson::SizeType>(stdKey.size()),_j.GetAllocator());
     
     RapidJson jVal;
     jVal.Set<T>(val);

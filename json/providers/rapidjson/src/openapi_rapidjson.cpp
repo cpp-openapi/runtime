@@ -2,20 +2,22 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-void RapidJson::Parse(const std::string & data)
+#include "strconv.h"
+
+void RapidJson::Parse(const openapi::string_t & data)
 {
-    this->_j.Parse(data.c_str());
+    this->_j.Parse(openapi::ToStdString(data.c_str()).c_str());
 }
 
-bool RapidJson::HasKey(const std::string &key) const
+bool RapidJson::HasKey(const openapi::string_t &key) const
 {
-    return this->_j.HasMember(key.c_str());
+    return this->_j.HasMember(openapi::ToStdString(key.c_str()).c_str());
 }
 
-std::string RapidJson::ToString() const
+openapi::string_t RapidJson::ToString() const
 {
     rapidjson::StringBuffer buffer;
     rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
     _j.Accept(writer);
-    return std::string(buffer.GetString());
+    return openapi::StringT(buffer.GetString());
 }

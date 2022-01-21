@@ -1,6 +1,7 @@
 #include "gtest/gtest.h"
 #include <string>
 #include <memory>
+#include "strconv.h"
 
 #include "openapi_json_macro.h"
 #include <nlohmann/json.hpp> // for raw json compare
@@ -13,7 +14,7 @@ typedef RapidJson Json;
 typedef NlohmannJson Json;
 #endif
 
-const char *personJson = R"(
+openapi::string_t personJson = openapi::StringT(R"(
     {
         "name": "John",
         "age" : 10,
@@ -39,19 +40,19 @@ const char *personJson = R"(
         "project_names" : ["project1","project2"],
         "orders" : [{"id":11},{"id":12}]
     }
-)";
+)");
 
 struct Address
 {
-    std::string state;
-    std::string city;
+    openapi::string_t state;
+    openapi::string_t city;
     OPENAPI_JSON_CONVERT_FUNCS_DECLARE
 };
 OPENAP_JSON_CONVERT_FUNCS(Address, state, city)
 
 struct Company
 {
-    std::string name;
+    openapi::string_t name;
     std::shared_ptr<Address> location;
     OPENAPI_JSON_CONVERT_FUNCS_DECLARE
 };
@@ -66,13 +67,13 @@ OPENAP_JSON_CONVERT_FUNCS(Order, id)
 
 struct Person
 {
-    std::string name;
+    openapi::string_t name;
     int age;
-    std::optional<std::string> optional_id;
+    std::optional<openapi::string_t> optional_id;
     std::vector<Address> address;
     Company company;
     std::vector<int> project_ids;
-    std::vector<std::string> project_names;
+    std::vector<openapi::string_t> project_names;
     std::vector<std::shared_ptr<Order>> orders;
     OPENAPI_JSON_CONVERT_FUNCS_DECLARE
 };
@@ -86,19 +87,19 @@ TEST(Json, Deserialize)
     Person p;
     p.FromJSON(j);
 
-    ASSERT_EQ("John", p.name);
+    ASSERT_EQ(OPENAPI_LITERAL(John), p.name);
     ASSERT_EQ(p.age, 10);
     
     ASSERT_TRUE(p.optional_id.has_value());
-    ASSERT_EQ("xyz", p.optional_id.value());
+    ASSERT_EQ(OPENAPI_LITERAL(xyz), p.optional_id.value());
 
     ASSERT_EQ(2, p.address.size());
     Address expectAddr1 = {
-        "CA",
-        "Los Angeles"};
+        openapi::StringT("CA"),
+        openapi::StringT("Los Angeles")};
     Address expectAddr2 = {
-        "WA",
-        "Seattle"};
+        openapi::StringT("WA"),
+        openapi::StringT("Seattle")};
 
     Address actualAddr1 = p.address[0];
     Address actualAddr2 = p.address[1];
@@ -109,9 +110,9 @@ TEST(Json, Deserialize)
     ASSERT_EQ(expectAddr2.city, actualAddr2.city);
     // ASSERT_EQ(expectAddr1, actualAddr1);
 
-    ASSERT_EQ("Costco", p.company.name);
-    ASSERT_EQ("OR", p.company.location->state);
-    ASSERT_EQ("Portland", p.company.location->city);
+    ASSERT_EQ(openapi::StringT("Costco"), p.company.name);
+    ASSERT_EQ(openapi::StringT("OR"), p.company.location->state);
+    ASSERT_EQ(openapi::StringT("Portland"), p.company.location->city);
 
     ASSERT_EQ(3, p.project_ids.size());
     std::vector<int> expected_project_ids = {1, 2, 3};
@@ -121,7 +122,7 @@ TEST(Json, Deserialize)
     }
 
     ASSERT_EQ(2, p.project_names.size());
-    std::vector<std::string> expected_project_names = {"project1", "project2"};
+    std::vector<openapi::string_t> expected_project_names = {openapi::StringT("project1"), openapi::StringT("project2")};
     for (int i = 0; i < expected_project_names.size(); i++)
     {
         ASSERT_EQ(expected_project_names[i], p.project_names[i]);
@@ -135,26 +136,26 @@ TEST(Json, Deserialize)
 TEST(Json, Serialize)
 {
     Person p;
-    p.name = "John";
+    p.name = openapi::StringT("John");
     p.age = 10;
     p.address = {
-        {"CA", "Los Angeles"},
-        {"WA", "Seattle"}};
+        {openapi::StringT("CA"), openapi::StringT("Los Angeles")},
+        {openapi::StringT("WA"), openapi::StringT("Seattle")}};
 
     //     "name" : "Costco",
     //     "location" : {
     //         "state" : "OR",
     //         "city" : "Portland"
     //     }
-    p.company.name = "Costco";
+    p.company.name = openapi::StringT("Costco");
     p.company.location = std::make_shared<Address>();
-    p.company.location->state = "OR";
-    p.company.location->city = "Portland";
+    p.company.location->state = openapi::StringT("OR");
+    p.company.location->city = openapi::StringT("Portland");
 
     //  "project_ids" : [1,2,3],
     //  "project_names" : ["project1","project2"],
     p.project_ids = {1, 2, 3};
-    p.project_names = {"project1", "project2"};
+    p.project_names = {openapi::StringT("project1"), openapi::StringT("project2")};
 
     // "orders" : [{"id":11},{"id":12}]
     p.orders = {std::make_shared<Order>(), std::make_shared<Order>()};
@@ -164,12 +165,12 @@ TEST(Json, Serialize)
     Json j;
     p.ToJSON(j);
 
-    ASSERT_EQ(p.name, j.GetMember<std::string>("name"));
-    ASSERT_EQ(p.age, j.GetMember<int>("age"));
+    ASSERT_EQ(p.name, j.GetMember<openapi::string_t>(openapi::StringT("name")));
+    ASSERT_EQ(p.age, j.GetMember<int>(openapi::StringT("age")));
 
     // address
     std::vector<Address> &addressExpect = p.address;
-    std::vector<Address> addressResult = j.GetMember<std::vector<Address>>("address");
+    std::vector<Address> addressResult = j.GetMember<std::vector<Address>>(openapi::StringT("address"));
     ASSERT_EQ(addressExpect.size(), addressResult.size());
     ASSERT_EQ(addressExpect[0].state, addressResult[0].state);
     ASSERT_EQ(addressExpect[0].city, addressResult[0].city);
@@ -178,16 +179,16 @@ TEST(Json, Serialize)
 
     // company
     Company companyExpected = p.company;
-    Company companyResult = j.GetMember<Company>("company");
+    Company companyResult = j.GetMember<Company>(openapi::StringT("company"));
     ASSERT_EQ(companyExpected.name, companyResult.name);
 
     // array
-    ASSERT_EQ(p.project_ids, j.GetMember<std::vector<int>>("project_ids"));
-    ASSERT_EQ(p.project_names, j.GetMember<std::vector<std::string>>("project_names"));
+    ASSERT_EQ(p.project_ids, j.GetMember<std::vector<int>>(openapi::StringT("project_ids")));
+    ASSERT_EQ(p.project_names, j.GetMember<std::vector<openapi::string_t>>(openapi::StringT("project_names")));
 
     // orders
     std::vector<std::shared_ptr<Order>> &orderExpected = p.orders;
-    std::vector<std::shared_ptr<Order>> ordersResult = j.GetMember<std::vector<std::shared_ptr<Order>>>("orders");
+    std::vector<std::shared_ptr<Order>> ordersResult = j.GetMember<std::vector<std::shared_ptr<Order>>>(openapi::StringT("orders"));
     ASSERT_EQ(orderExpected.size(), ordersResult.size());
     ASSERT_EQ(orderExpected[0]->id, ordersResult[0]->id);
     ASSERT_EQ(orderExpected[1]->id, ordersResult[1]->id);
@@ -205,6 +206,6 @@ TEST(Json, deserialize_identity)
 
     nlohmann::json jExpect = nlohmann::json::parse(personJson);
     nlohmann::json jResult = nlohmann::json::parse(j2.ToString());
+    // std::cout << "debug" << openapi::ToStdString(j2.ToString()) << std::endl;
     ASSERT_TRUE(jExpect == jResult);
-    //std::cout << "debug" << j2->ToString() << std::endl;
 }

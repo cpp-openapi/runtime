@@ -1,15 +1,17 @@
 #include "openapi_nlohmann_json.h"
+#include "strconv.h"
 
-bool NlohmannJson::HasKey(const std::string &key) const
+bool NlohmannJson::HasKey(const openapi::string_t &key) const
 {
-    return this->_j.contains(key);
+    return this->_j.contains(openapi::ToStdString(key)); // TODO: wchar to char
 }
 
-void NlohmannJson::Parse(const std::string &data)
+void NlohmannJson::Parse(const openapi::string_t &data)
 {
-    this->_j = nlohmann::json::parse(data);
+    this->_j = nlohmann::json::parse(openapi::ToStdString(data));
 }
 
-std::string NlohmannJson::ToString() const{
-    return this->_j.dump();
+openapi::string_t NlohmannJson::ToString() const
+{
+    return openapi::StringT(this->_j.dump().c_str());
 }

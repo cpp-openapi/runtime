@@ -1,6 +1,7 @@
 #pragma once
 
 #include "runtime_types.h"
+#include "strconv.h"
 #include <nlohmann/json.hpp>
 #include <memory>
 
@@ -9,27 +10,27 @@ class NlohmannJson
 public:
     NlohmannJson(): _j() { }
 
-    void Parse(const std::string &data);
+    void Parse(const openapi::string_t &data);
 
-    bool HasKey(const std::string &key) const;
+    bool HasKey(const openapi::string_t &key) const;
 
 
-    std::string ToString() const;
-
-    template<typename T>
-    static std::string Serialize(T val);
+    openapi::string_t ToString() const;
 
     template<typename T>
-    static T Deserialize(const std::string &data);
+    static openapi::string_t Serialize(T val);
+
+    template<typename T>
+    static T Deserialize(const openapi::string_t &data);
 
     template<typename T>
     T Get() const;
     
     template<typename T>
-    T GetMember(const std::string &key) const;
+    T GetMember(const openapi::string_t &key) const;
 
     template<typename T>
-    void AddMember(const std::string &key, T val);
+    void AddMember(const openapi::string_t &key, T val);
 
     // set json value, used mainly for array
     template<typename T>
@@ -41,7 +42,7 @@ private:
 };
 
 template<typename T>
-std::string NlohmannJson::Serialize(T val)
+openapi::string_t NlohmannJson::Serialize(T val)
 {
     NlohmannJson j;
     j.Set(val);
@@ -49,7 +50,7 @@ std::string NlohmannJson::Serialize(T val)
 }
 
 template<typename T>
-T NlohmannJson::Deserialize(const std::string &data)
+T NlohmannJson::Deserialize(const openapi::string_t &data)
 {
     NlohmannJson j;
     j.Parse(data);
@@ -68,9 +69,23 @@ T NlohmannJson::Get() const
         i = this->Get<V>();
     }
     // handle primitive types
-    else if constexpr (std::is_same<T, int>::value || std::is_same<T, std::string>::value) 
+    else if constexpr (std::is_same<T, int>::value)
     {
         this->_j.get_to<T>(i);       
+    }
+    else if constexpr (std::is_same<T, openapi::string_t>::value)
+    {
+        if constexpr (std::is_same<std::string, openapi::string_t>::value)
+        {
+            this->_j.get_to<T>(i);
+        }
+        else
+        {
+            // first convert utf8 then to utf16
+            std::string narrow;
+            this->_j.get_to<std::string>(narrow);
+            i = openapi::StringT(narrow.c_str());
+        }
     }
     else if constexpr(is_vector<T>::value)
     {
@@ -103,14 +118,14 @@ T NlohmannJson::Get() const
 
 
 template<typename T>
-T NlohmannJson::GetMember(const std::string &key) const
+T NlohmannJson::GetMember(const openapi::string_t &key) const
 {
     if (!this->HasKey(key))
     {
         throw new std::invalid_argument("key not found");
     }
 
-    nlohmann::json inner = this->_j.at(key);
+    nlohmann::json inner = this->_j.at(openapi::ToStdString(key));
     NlohmannJson j2;
     j2._j = inner;
     return j2.Get<T>();
@@ -127,10 +142,13 @@ void NlohmannJson::Set(T val)
         }
         // TODO: set null?
     }
-    else if constexpr (std::is_same<T, int>::value 
-        || std::is_same<T, std::string>::value) 
+    else if constexpr (std::is_same<T, int>::value)
     {
         this->_j = val;     
+    }
+    else if constexpr (std::is_same<T, openapi::string_t>::value)
+    {
+        this->_j = openapi::ToStdString(val);
     }
     else if constexpr(std::is_same<T, NlohmannJson>::value)
     {
@@ -165,9 +183,9 @@ void NlohmannJson::Set(T val)
 
 
 template<typename T>
-void NlohmannJson::AddMember(const std::string &key, T val)
+void NlohmannJson::AddMember(const openapi::string_t &key, T val)
 {
     NlohmannJson jVal;
     jVal.Set(val);
-    this->_j[key] = jVal._j;
+    this->_j[openapi::ToStdString(key)] = jVal._j;
 }

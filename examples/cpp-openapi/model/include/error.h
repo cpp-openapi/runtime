@@ -9,6 +9,6 @@ class Error
 {
 public:
     std::optional<int> code;
-    std::optional<std::string> message;
+    std::optional<openapi::string_t> message;
     OPENAPI_JSON_CONVERT_FUNCS_DECLARE
 };

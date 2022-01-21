@@ -34,7 +34,7 @@ int main()
 
         {
             AddOneParams p;
-            p.Body = Item{0, "hello"};
+            p.Body = Item{0, openapi::StringT("hello")};
             std::future<AddOneResponse> r = ts.AddOne(p);
             std::cout << "Add one: " << r.get() << std::endl;
         }

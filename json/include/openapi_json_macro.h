@@ -1,5 +1,7 @@
 #pragma once
 
+#include "runtime_types.h"
+
 // Expand forces msvc to expand arg, where gcc automatically expands recursively.
 #define OPENAPI_EXPAND(x) x
 
@@ -40,14 +42,14 @@
 
 #define OPENAPI_TO_JSON_MEMBER(arg1) \
 { \
-    j.AddMember<decltype(this->arg1)>(#arg1, arg1);\
+    j.AddMember<decltype(this->arg1)>(OPENAPI_LITERAL(arg1), arg1);\
 }
 
 #define OPENAPI_FROM_JSON_MEMBER(arg1) \
-    if(j.HasKey(#arg1)) \
+    if(j.HasKey(OPENAPI_LITERAL(arg1))) \
     { \
         using V = remove_optional<decltype(this->arg1)>::type;\
-        this->arg1 = j.GetMember<V>(#arg1); \
+        this->arg1 = j.GetMember<V>(OPENAPI_LITERAL(arg1)); \
     }
 
 #define OPENAPI_TO_JSON_FUNC(arg1, ...) \

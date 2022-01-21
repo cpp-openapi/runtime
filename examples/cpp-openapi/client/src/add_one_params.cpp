@@ -12,6 +12,6 @@ void AddOneParams::WriteParams(std::shared_ptr<IOASClientRequest> req) const
 
     if (this->Body.has_value())
     {
-        req->SetBodyParam(Json::Serialize(this->Body));
+        req->SetBodyParam(openapi::ToStdString(Json::Serialize(this->Body)));
     }
 }
