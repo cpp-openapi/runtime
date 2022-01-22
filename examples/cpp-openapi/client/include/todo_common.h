@@ -1,8 +1,8 @@
 #pragma once
 
-#include "request.h"
-#include "response.h"
-#include "executor.h"
+#include "openapi/runtime/request.h"
+#include "openapi/runtime/response.h"
+#include "openapi/runtime/executor.h"
 
 // returns future of response
 template<typename P, typename R>
@@ -30,7 +30,7 @@ std::future<R> ProcessAPI(const P &params, std::shared_ptr<IClient> cli, AuthInf
             result.ReadResponse(resp);
             p->set_value(result);
         }
-        catch(const std::exception &e)
+        catch([[maybe_unused]] const std::exception &e)
         {
             try
             {

@@ -1,7 +1,7 @@
 #pragma once
 
-#include "runtime_types.h"
-#include "strconv.h"
+#include "openapi/runtime/runtime_types.h"
+#include "openapi/runtime/strconv.h"
 #include "rapidjson/document.h"
 #include <memory>
 #include <string>

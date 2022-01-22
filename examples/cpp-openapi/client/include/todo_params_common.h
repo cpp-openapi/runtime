@@ -1,6 +1,6 @@
 #pragma once
 
-#include "request.h"
+#include "openapi/runtime/request.h"
 #include <memory>
 
 // P must be param type

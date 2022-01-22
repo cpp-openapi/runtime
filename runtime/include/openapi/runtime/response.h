@@ -1,6 +1,6 @@
 #pragma once
 
-#include "common.h"
+#include "openapi/runtime/common.h"
 #include <sstream>
 
 class IOASClientResponse

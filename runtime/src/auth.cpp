@@ -1,4 +1,4 @@
-#include "auth.h"
+#include "openapi/runtime/auth.h"
 
 AuthInfoWriter APIAuth(std::string key, std::string val)
 {

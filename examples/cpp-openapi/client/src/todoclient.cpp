@@ -1,8 +1,8 @@
 
 #include "todoclient.h"
-#include "request.h"
+#include "openapi/runtime/request.h"
 #include "todo_common.h"
-#include "executor.h"
+#include "openapi/runtime/executor.h"
 
 std::future<AddOneResponse> todoservice::AddOne(AddOneParams params)
 {

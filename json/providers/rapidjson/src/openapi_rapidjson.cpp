@@ -1,8 +1,8 @@
-#include "openapi_rapidjson.h"
+#include "openapi/json/rapid.h"
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-#include "strconv.h"
+#include "openapi/runtime/strconv.h"
 
 void RapidJson::Parse(const openapi::string_t & data)
 {

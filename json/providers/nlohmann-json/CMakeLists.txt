@@ -12,7 +12,7 @@ endif()
 # json dep end
 
 file(GLOB SOURCES
-    include/*.h
+    include/openapi/json/*.h
     src/*.cpp
 )
 

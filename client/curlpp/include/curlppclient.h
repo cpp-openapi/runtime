@@ -1,5 +1,5 @@
 #pragma once
-#include "client.h"
+#include "openapi/runtime/client.h"
 
 class CurlPPClient : public IClient
 {

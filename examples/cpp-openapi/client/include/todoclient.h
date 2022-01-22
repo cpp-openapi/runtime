@@ -3,7 +3,7 @@
 
 #include <string>
 #include <memory>
-#include "client.h"
+#include "openapi/runtime/client.h"
 
 #include "add_one_params.h"
 #include "add_one_response.h"
@@ -13,7 +13,7 @@
 
 #include "destroy_one_params.h"
 #include "destroy_one_response.h"
-#include "auth.h"
+#include "openapi/runtime/auth.h"
 
 // defines api tag methods
 class todoservice

@@ -1,5 +1,5 @@
 #include "curlppclient.h"
-#include "executor.h"
+#include "openapi/runtime/executor.h"
 
 #include <curlpp/cURLpp.hpp>
 #include <curlpp/Easy.hpp>

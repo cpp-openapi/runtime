@@ -4,17 +4,16 @@
 #include <nlohmann/json.hpp> // for raw json compare
 #include <memory>
 
-#include "runtime_types.h"
+#include "openapi/runtime/runtime_types.h"
+#include "openapi/runtime/strconv.h"
 
-#include "openapi_json_macro.h"
-
-#include "strconv.h"
+#include "openapi/json/macro.h"
 
 #ifdef OPENAPI_RAPIDJSON
-#include "openapi_rapidjson.h"
+#include "openapi/json/rapid.h"
 typedef RapidJson Json;
 #elif defined(OPENAPI_NLOHMANNJSON)
-#include "openapi_nlohmann_json.h"
+#include "openapi/json/nlohmann.h"
 typedef NlohmannJson Json;
 #endif
 

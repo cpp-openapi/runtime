@@ -1,5 +1,5 @@
 #include "gtest/gtest.h"
-#include "strconv.h"
+#include "openapi/runtime/strconv.h"
 
 TEST(StrConv_test, basic) {
 #ifdef OPENAPI_UTF16_STRINGS

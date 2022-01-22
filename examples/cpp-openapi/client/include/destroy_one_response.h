@@ -1,6 +1,6 @@
 #pragma once
 
-#include "response.h"
+#include "openapi/runtime/response.h"
 #include "error.h"
 #include <optional>
 #include <memory>

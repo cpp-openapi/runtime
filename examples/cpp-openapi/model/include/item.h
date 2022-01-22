@@ -4,7 +4,7 @@
 #include <memory>
 #include <optional>
 #include "settings.h"
-#include "runtime_types.h"
+#include "openapi/runtime/runtime_types.h"
 
 class Item
 {

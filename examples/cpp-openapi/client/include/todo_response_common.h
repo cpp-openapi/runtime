@@ -1,8 +1,8 @@
 #pragma once
 
-#include "response.h"
+#include "openapi/runtime/response.h"
 #include "typefactory.h"
-#include "runtime_types.h"
+#include "openapi/runtime/runtime_types.h"
 #include <memory>
 
 template <typename R>

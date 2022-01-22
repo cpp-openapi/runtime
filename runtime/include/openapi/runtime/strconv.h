@@ -1,5 +1,5 @@
 #pragma once
-#include "runtime_types.h"
+#include "openapi/runtime/runtime_types.h"
 
 // #include <cstring> // strlen
 #include <cwchar>

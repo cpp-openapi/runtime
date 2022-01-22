@@ -5,8 +5,8 @@
 #include <map>
 #include <memory>
 
-#include "common.h"
-#include "response.h"
+#include "openapi/runtime/common.h"
+#include "openapi/runtime/response.h"
 // Request for openapi
 // it can convert to http request of underlying impl
 //

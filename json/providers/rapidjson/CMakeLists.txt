@@ -12,7 +12,7 @@ FetchContent_MakeAvailable(RapidJSON)
 
 
 file(GLOB SOURCES
-    include/*.h
+    include/json/*.h
     src/*.cpp
 )
 

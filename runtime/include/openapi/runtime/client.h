@@ -3,8 +3,8 @@
 // middleware of different http clients
 
 #include <string>
-#include "request.h"
-#include "response.h"
+#include "openapi/runtime/request.h"
+#include "openapi/runtime/response.h"
 #include <future>
 
 struct ClientConfig

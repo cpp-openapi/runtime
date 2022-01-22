@@ -1,5 +1,5 @@
 file(GLOB SOURCES
-    include/*.h
+    include/openapi/runtime/*.h
     src/*.cpp
 )
 

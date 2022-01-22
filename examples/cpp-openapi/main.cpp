@@ -2,8 +2,8 @@
 #include "typefactory.h"
 #include <iostream>
 // #include <boost/stacktrace.hpp>
-#include "auth.h"
-#include "executor.h"
+#include "openapi/runtime/auth.h"
+#include "openapi/runtime/executor.h"
 
 int main()
 {

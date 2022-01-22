@@ -1,16 +1,16 @@
 #include "gtest/gtest.h"
 #include <string>
 #include <memory>
-#include "strconv.h"
+#include "openapi/runtime/strconv.h"
 
-#include "openapi_json_macro.h"
+#include "openapi/json/macro.h"
 #include <nlohmann/json.hpp> // for raw json compare
 
 #ifdef OPENAPI_RAPIDJSON
-#include "openapi_rapidjson.h"
+#include "openapi/json/rapid.h"
 typedef RapidJson Json;
 #elif defined(OPENAPI_NLOHMANNJSON)
-#include "openapi_nlohmann_json.h"
+#include "openapi/json/nlohmann.h"
 typedef NlohmannJson Json;
 #endif
 

@@ -1,6 +1,6 @@
 #pragma once
 // #include "jsonopenapi.h"
-#include "client.h"
+#include "openapi/runtime/client.h"
 
 class TypeFactory
 {

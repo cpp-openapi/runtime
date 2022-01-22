@@ -1,6 +1,6 @@
 #pragma once
 
-#include "runtime_types.h"
+#include "openapi/runtime/runtime_types.h"
 
 // Expand forces msvc to expand arg, where gcc automatically expands recursively.
 #define OPENAPI_EXPAND(x) x
