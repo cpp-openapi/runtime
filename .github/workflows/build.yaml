@@ -9,6 +9,7 @@ jobs:
       matrix:
         OPENAPI_JSON: ["OPENAPI_NLOHMANNJSON", "OPENAPI_RAPIDJSON"]
         OPENAPI_CLIENT: ["OPENAPI_CLIENT_CURLPP", "OPENAPI_CLIENT_BREAST"]
+        OPENAPI_UTF16_STRINGS: ["ON", "OFF"]
         BUILD_TYPE: ["Debug", "Release"]
         os: [ ubuntu-latest, windows-latest ]
     steps:
@@ -37,7 +38,10 @@ jobs:
     - name: run cmake
       env:
         BOOST_ROOT: ${{ steps.install-boost.outputs.BOOST_ROOT }}
-      run: cmake . -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} -DOPENAPI_JSON=${{ matrix.OPENAPI_JSON }} -DOPENAPI_CLIENT=${{ matrix.OPENAPI_CLIENT }} -B build
+      run: > 
+        cmake . -DCMAKE_BUILD_TYPE=${{ matrix.BUILD_TYPE }} 
+        -DOPENAPI_JSON=${{ matrix.OPENAPI_JSON }} -DOPENAPI_CLIENT=${{ matrix.OPENAPI_CLIENT }} 
+        -DOPENAPI_UTF16_STRINGS=${{ matrix.OPENAPI_UTF16_STRINGS }} -B build
 
     - name: run build
       run: cmake --build build --config ${{ matrix.BUILD_TYPE }}
@@ -57,7 +61,7 @@ jobs:
     - name: Save main exe
       uses: actions/upload-artifact@v2
       with:
-        name: ${{ matrix.os }}_${{ matrix.BUILD_TYPE }}_${{ matrix.OPENAPI_JSON }}_${{ matrix.OPENAPI_CLIENT }}_main-exe
+        name: ${{ matrix.os }}_${{ matrix.BUILD_TYPE }}_${{ matrix.OPENAPI_JSON }}_${{ matrix.OPENAPI_CLIENT }}_${{ matrix.OPENAPI_UTF16_STRINGS }}_main-exe
         path: |
           build/examples/cpp-openapi/main
           build/examples/cpp-openapi/**/main.exe
@@ -94,13 +98,14 @@ jobs:
       matrix:
         OPENAPI_JSON: ["OPENAPI_NLOHMANNJSON", "OPENAPI_RAPIDJSON"]
         OPENAPI_CLIENT: ["OPENAPI_CLIENT_CURLPP", "OPENAPI_CLIENT_BREAST"]
+        OPENAPI_UTF16_STRINGS: ["ON", "OFF"]
         BUILD_TYPE: ["Debug", "Release"]
         os: [ ubuntu-latest, windows-latest ]
     steps:
       - name: download main executable
         uses: actions/download-artifact@master
         with:
-          name: ${{ matrix.os }}_${{ matrix.BUILD_TYPE }}_${{ matrix.OPENAPI_JSON }}_${{ matrix.OPENAPI_CLIENT }}_main-exe
+          name: ${{ matrix.os }}_${{ matrix.BUILD_TYPE }}_${{ matrix.OPENAPI_JSON }}_${{ matrix.OPENAPI_CLIENT }}_${{ matrix.OPENAPI_UTF16_STRINGS }}_main-exe
           path: build/examples/cpp-openapi
       
       - name: download server

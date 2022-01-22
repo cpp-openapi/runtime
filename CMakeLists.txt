@@ -44,7 +44,7 @@ if (NOT OPENAPI_CLIENT IN_LIST OPENAPI_CLIENT_OPT_STRINGS)
 endif()
 
 # utf16 option
-set(OPENAPI_UTF16_STRINGS "Use wchar type for string_t" ON)
+option(OPENAPI_UTF16_STRINGS "Use wchar type for string_t" ON)
 
 if(OPENAPI_BuildTests)
   # import google test
