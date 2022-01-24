@@ -4,10 +4,15 @@
 #include <nlohmann/json.hpp> // for raw json compare
 #include <memory>
 
+// custom string types we skip std types impl
+#ifndef OPENAPI_CUSTOM_STRING_TYPES
 #include "openapi/runtime/runtime_types.h"
 #include "openapi/runtime/strconv.h"
+#endif
 
 #include "openapi/json/macro.h"
+
+#ifndef OPENAPI_CUSTOM_JSON // custom json may use this test
 
 #ifdef OPENAPI_RAPIDJSON
 #include "openapi/json/rapid.h"
@@ -16,6 +21,8 @@ typedef RapidJson Json;
 #include "openapi/json/nlohmann.h"
 typedef NlohmannJson Json;
 #endif
+
+#endif // OPENAPI_CUSTOM_JSON
 
 TEST(Json2, GetInt)
 {
@@ -28,7 +35,7 @@ TEST(Json2, GetInt)
     )"));
 
     ASSERT_EQ(1, x.GetMember<int>(openapi::StringT("int")));
-    ASSERT_EQ(openapi::StringT("str_val"), x.GetMember<openapi::string_t>(openapi::StringT("str")));
+    ASSERT_EQ(openapi::ToStdString(openapi::StringT("str_val")), openapi::ToStdString(x.GetMember<openapi::string_t>(openapi::StringT("str"))));
 }
 
 TEST(Json2, GetArray)
@@ -65,15 +72,15 @@ TEST(Json2, GetAndSetStruct)
     )"));
 
     Book b = x.Get<Book>();
-    ASSERT_EQ(openapi::StringT("MyTitle"), b.title);
+    ASSERT_EQ(openapi::ToStdString(openapi::StringT("MyTitle")), openapi::ToStdString(b.title));
     ASSERT_EQ(10, b.pages);
 
     // serrialize back
     Json x2;
     x2.Set(b);
     
-    nlohmann::json r = nlohmann::json::parse(x.ToString());
-    nlohmann::json r2 = nlohmann::json::parse(x2.ToString());
+    nlohmann::json r = nlohmann::json::parse(openapi::ToStdString(x.ToString()));
+    nlohmann::json r2 = nlohmann::json::parse(openapi::ToStdString(x2.ToString()));
     ASSERT_TRUE(r == r2);
 }
 

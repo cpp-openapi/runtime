@@ -6,6 +6,9 @@
 
 #include <string>
 
+// indicates this header is included. string_t is defined.
+#define OPENAPI_RUNTIME_TYPES_STD 1
+
 // remove optional
 template<typename T>
 struct remove_optional
@@ -45,6 +48,10 @@ template<typename T> struct is_vector : public std::false_type {};
 template<typename T, typename A>
 struct is_vector<std::vector<T, A>> : public std::true_type {};
 
+
+#ifndef OPENAPI_CUSTOM_STRING_TYPES
+// define default openapi string types
+
 // string type
 namespace openapi 
 {
@@ -66,3 +73,4 @@ typedef wchar_t char_t;
 
 } // namespace openapi
 
+#endif // OPENAPI_CUSTOM_STRING_TYPES

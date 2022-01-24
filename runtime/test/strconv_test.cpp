@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "openapi/runtime/runtime_types.h"
 #include "openapi/runtime/strconv.h"
 
 TEST(StrConv_test, basic) {

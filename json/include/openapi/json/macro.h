@@ -42,14 +42,14 @@
 
 #define OPENAPI_TO_JSON_MEMBER(arg1) \
 { \
-    j.AddMember<decltype(this->arg1)>(OPENAPI_LITERAL(arg1), arg1);\
+    j.AddMember<decltype(this->arg1)>(openapi::StringT(OPENAPI_LITERAL(arg1)), arg1);\
 }
 
 #define OPENAPI_FROM_JSON_MEMBER(arg1) \
-    if(j.HasKey(OPENAPI_LITERAL(arg1))) \
+    if(j.HasKey(openapi::StringT(OPENAPI_LITERAL(arg1)))) \
     { \
         using V = remove_optional<decltype(this->arg1)>::type;\
-        this->arg1 = j.GetMember<V>(OPENAPI_LITERAL(arg1)); \
+        this->arg1 = j.GetMember<V>(openapi::StringT(OPENAPI_LITERAL(arg1))); \
     }
 
 #define OPENAPI_TO_JSON_FUNC(arg1, ...) \

@@ -2,8 +2,6 @@
 #include "rapidjson/writer.h"
 #include "rapidjson/stringbuffer.h"
 
-#include "openapi/runtime/strconv.h"
-
 void RapidJson::Parse(const openapi::string_t & data)
 {
     this->_j.Parse(openapi::ToStdString(data.c_str()).c_str());
