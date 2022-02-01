@@ -47,7 +47,8 @@ openapi::string_t personJson = openapi::StringT(R"(
         },
         "project_ids" : [1,2,3],
         "project_names" : ["project1","project2"],
-        "orders" : [{"id":11},{"id":12}]
+        "orders" : [{"id":11},{"id":12}],
+        "married" : true
     }
 )");
 
@@ -84,9 +85,10 @@ struct Person
     std::vector<int> project_ids;
     std::vector<openapi::string_t> project_names;
     std::vector<std::shared_ptr<Order>> orders;
+    bool married;
     OPENAPI_JSON_CONVERT_FUNCS_DECLARE
 };
-OPENAP_JSON_CONVERT_FUNCS(Person, name, age, optional_id, address, company, project_ids, project_names, orders)
+OPENAP_JSON_CONVERT_FUNCS(Person, name, age, optional_id, address, company, project_ids, project_names, orders, married)
 
 TEST(Json, Deserialize)
 {
@@ -140,6 +142,8 @@ TEST(Json, Deserialize)
     ASSERT_EQ(2, p.orders.size());
     ASSERT_EQ(11, p.orders[0]->id);
     ASSERT_EQ(12, p.orders[1]->id);
+
+    ASSERT_EQ(true, p.married);
 }
 
 TEST(Json, Serialize)
@@ -170,6 +174,8 @@ TEST(Json, Serialize)
     p.orders = {std::make_shared<Order>(), std::make_shared<Order>()};
     p.orders[0]->id = 11;
     p.orders[1]->id = 12;
+
+    p.married = true;
 
     Json j;
     p.ToJSON(j);
@@ -206,6 +212,9 @@ TEST(Json, Serialize)
     ASSERT_EQ(orderExpected.size(), ordersResult.size());
     ASSERT_EQ(orderExpected[0]->id, ordersResult[0]->id);
     ASSERT_EQ(orderExpected[1]->id, ordersResult[1]->id);
+
+    // bool
+    ASSERT_EQ(true, j.GetMember<bool>(openapi::StringT("married")));
 }
 
 TEST(Json, deserialize_identity)

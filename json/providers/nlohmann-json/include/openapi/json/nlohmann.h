@@ -69,7 +69,7 @@ T NlohmannJson::Get() const
         i = this->Get<V>();
     }
     // handle primitive types
-    else if constexpr (std::is_same<T, int>::value)
+    else if constexpr (std::is_same<T, int>::value || std::is_same<T, bool>::value)
     {
         this->_j.get_to<T>(i);       
     }
@@ -142,7 +142,7 @@ void NlohmannJson::Set(T val)
         }
         // TODO: set null?
     }
-    else if constexpr (std::is_same<T, int>::value)
+    else if constexpr (std::is_same<T, int>::value || std::is_same<T, bool>::value)
     {
         this->_j = val;     
     }

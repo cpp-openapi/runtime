@@ -76,6 +76,14 @@ T RapidJson::Get() const
         }
         i = this->_j.GetInt();     
     }
+    else if constexpr (std::is_same<T, bool>::value) 
+    {
+        if(!this->_j.IsBool())
+        {
+            throw new std::invalid_argument("not bool");
+        }
+        i = this->_j.GetBool();
+    }
     else if constexpr (std::is_same<T, openapi::string_t>::value)
     {
         if(!this->_j.IsString()){
@@ -143,6 +151,10 @@ void RapidJson::Set(T val)
     else if constexpr (std::is_same<T, int>::value) 
     {
         this->_j.SetInt(val);
+    }
+    else if constexpr (std::is_same<T, bool>::value) 
+    {
+        this->_j.SetBool(val);
     }
     else if constexpr (std::is_same<T, openapi::string_t>::value)
     {
