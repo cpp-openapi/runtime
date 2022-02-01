@@ -1,7 +1,7 @@
 #pragma once
 
-#include "openapi/runtime/runtime_types.h"
-#include "openapi/runtime/strconv.h"
+#include "openapi/runtime/string.h"
+#include "openapi/runtime/type_mangle.h"
 #include <nlohmann/json.hpp>
 #include <memory>
 

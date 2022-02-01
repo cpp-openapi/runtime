@@ -1,5 +1,7 @@
 #include "openapi/json/nlohmann.h"
 
+#include "openapi/runtime/strconv.h"
+
 bool NlohmannJson::HasKey(const openapi::string_t &key) const
 {
     return this->_j.contains(openapi::ToStdString(key)); // TODO: wchar to char

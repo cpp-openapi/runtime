@@ -2,7 +2,8 @@
 
 #include "openapi/runtime/response.h"
 #include "typefactory.h"
-#include "openapi/runtime/runtime_types.h"
+#include "openapi/runtime/string.h"
+#include "openapi/runtime/type_mangle.h"
 #include <memory>
 
 template <typename R>

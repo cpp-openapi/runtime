@@ -4,8 +4,8 @@
 
 // custom string types we skip std types impl
 #ifndef OPENAPI_CUSTOM_STRING_TYPES
-#include "openapi/runtime/runtime_types.h"
 #include "openapi/runtime/strconv.h"
+#include "openapi/runtime/string.h"
 #endif
 
 #include "openapi/json/macro.h"

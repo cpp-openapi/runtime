@@ -4,7 +4,8 @@
 #include <memory>
 #include <optional>
 #include "settings.h"
-#include "openapi/runtime/runtime_types.h"
+#include "openapi/runtime/string.h"
+#include "openapi/runtime/type_mangle.h"
 
 class Item
 {

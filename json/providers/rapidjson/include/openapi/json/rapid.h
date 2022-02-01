@@ -1,6 +1,7 @@
 #pragma once
 
-#include "openapi/runtime/runtime_types.h"
+#include "openapi/runtime/string.h"
+#include "openapi/runtime/type_mangle.h"
 #include "openapi/runtime/strconv.h"
 #include "rapidjson/document.h"
 #include <memory>
