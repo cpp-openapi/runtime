@@ -1,3 +1,5 @@
+add_subdirectory(middleware)
+
 file(GLOB SOURCES
     include/openapi/runtime/*.h
     src/*.cpp
