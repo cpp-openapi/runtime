@@ -2,9 +2,10 @@
 
 using namespace openapi;
 
-RouteBuilder& RouteBuilder::AddRoute(const std::string & pathPattern)
+RouteBuilder& RouteBuilder::AddRoute(const std::string & method, const std::string & pathPattern)
 {
-    this->routs_.emplace(pathPattern);
+    // TODO validate method
+    this->routs_[method].emplace(pathPattern);
     return *this;
 }
 
@@ -40,13 +41,19 @@ bool isRoutPartParam(const std::string & part)
     return (part.at(0) == '{' && part.at(part.size()-1) == '}');
 }
 
-bool Router::LookUp(const std::string & path, PathParamValue &paramsRet)
+bool Router::LookUp(const std::string & method, const std::string & path, PathParamValue &paramsRet)
 {
     PathParamValue tempParamsRet;
 
     // very inefficient
+    if(this->routs_.count(method) == 0)
+    {
+        return false;
+    }
+    const std::set<std::string> &routPaths = this->routs_[method];
+
     std::vector<std::string> inputParts = splitPath(path);
-    for(const std::string &rout : this->routs_)
+    for(const std::string &rout : routPaths)
     {
         std::vector<std::string> routParts = splitPath(rout);
         if(routParts.size() != inputParts.size())

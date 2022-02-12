@@ -10,20 +10,20 @@ using namespace openapi;
 TEST(Router, execute) 
 {    
     RouteBuilder b;
-    Router r = b.AddRoute("name/{name}/age/{age}")
-                .AddRoute("hello")
+    Router r = b.AddRoute("GET","name/{name}/age/{age}")
+                .AddRoute("PUT","hello")
                 .Build();
     
     {
         PathParamValue ret;
-        bool lookUpSuccess = r.LookUp("hello", ret);
+        bool lookUpSuccess = r.LookUp("PUT","hello", ret);
         ASSERT_TRUE(lookUpSuccess);
         ASSERT_EQ(0, ret.size());
     }
 
     {
         PathParamValue ret;
-        bool lookUpSuccess = r.LookUp("name/John/age/10", ret);
+        bool lookUpSuccess = r.LookUp("GET", "name/John/age/10", ret);
         ASSERT_TRUE(lookUpSuccess);
         ASSERT_EQ(2, ret.size());
         ASSERT_EQ("name", ret[0].first);
