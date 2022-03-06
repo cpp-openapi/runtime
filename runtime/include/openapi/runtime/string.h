@@ -3,6 +3,7 @@
 // #include "openapi/runtime/strconv.h"
 
 #include <string>
+#include <vector>
 
 // indicates this header is included. string_t is defined.
 #define OPENAPI_RUNTIME_TYPES_STD 1
@@ -37,6 +38,9 @@ std::string ToStdString(string_t text);
 
 string_t StringT(const wchar_t* mbstr);
 
+std::vector<std::string> SplitStdString(const std::string &data, const char delimiter);
+
+std::string JoinStrings(const std::vector<std::string> &data, const char delimiter);
 
 } // namespace openapi
 

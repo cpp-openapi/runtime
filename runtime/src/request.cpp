@@ -72,6 +72,10 @@ Values ClientRequestImpl::GetQueryParam() const {
     return this->_query;
 }
 
+std::map<std::string, std::string> ClientRequestImpl::GetPathParam() const {
+    return this->_pathParam;
+}
+
 std::string ClientRequestImpl::GetMethod() const
 {
     return this->_method;

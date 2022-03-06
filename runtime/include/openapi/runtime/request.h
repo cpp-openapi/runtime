@@ -7,6 +7,85 @@
 
 #include "openapi/runtime/common.h"
 #include "openapi/runtime/response.h"
+#include "openapi/runtime/string.h"
+#include "openapi/runtime/strconv.h"
+#include "openapi/runtime/type_mangle.h"
+
+
+template<typename T>
+T StringToType(std::string const & str){
+     if constexpr (std::is_same<T, int>::value)
+    {
+        return std::stoi(str);
+    }
+    else if constexpr (std::is_same<T, std::string>::value)
+    {
+        return str;
+    }
+    else if constexpr (std::is_same<T, std::wstring>::value)
+    {
+        std::wstring wide = openapi::WideCharToMultiByte(str.c_str());
+        return wide;
+    }
+    else
+    {
+        static_assert("Type is not supported");
+        return str;
+    }
+}
+
+template<typename T>
+std::string TypeToString(T const & val){
+    if constexpr (std::is_same<T, int>::value)
+    {
+        return std::to_string(val);
+    }
+    else if constexpr (std::is_same<T, std::string>::value)
+    {
+        return val;
+    }
+    else if constexpr (std::is_same<T, std::wstring>::value)
+    {
+        return openapi::MultiByteToWideChar(val.c_str());
+    }
+    else if constexpr (std::is_same<T, const wchar_t *>::value)
+    {
+        return TypeToString(std::wstring(val));
+    }
+    else
+    {
+        static_assert("Type is not supported");
+        // compiler has bug that const char* is not caught
+        return val;
+    }
+}
+
+// data is the data in the request.
+template<typename T>
+std::vector<T> StrVecToTypeVec(std::vector<std::string> data)
+{
+    std::vector<T> retVec;
+    for (std::string const & part : data)
+    {
+        T i = StringToType<T>(part);
+        retVec.push_back(i);
+    }
+    return retVec;
+}
+
+template<typename T>
+std::vector<std::string> TypeVecToStrVec(std::vector<T> data)
+{
+    std::vector<std::string> retVec;
+    for (T const & part : data)
+    {
+        std::string i = TypeToString<T>(part);
+        retVec.push_back(i);
+    }
+    return retVec;
+}
+
+
 // Request for openapi
 // it can convert to http request of underlying impl
 //
@@ -25,6 +104,7 @@ public:
     virtual std::string GetBody() const = 0;
     virtual Header GetHeaderParam() const = 0;
     virtual Values GetQueryParam() const = 0;
+    virtual std::map<std::string, std::string> GetPathParam() const = 0;
     virtual std::string GetMethod() const = 0;
 
     void SetHeaderParam(std::string key, std::string val);
@@ -37,50 +117,106 @@ public:
 
     template <typename T>
     void SetHeaderParam(std::string key, T val){
-        if constexpr (std::is_same<T, int>::value)
+        if constexpr (is_vector<T>::value)
         {
-            this->SetHeaderParam(key, std::to_string(val));
-        }
-        else if constexpr (std::is_same<T, std::string>::value)
-        {
-            this->SetHeaderParam(key, val);
-        }
+            using V = typename T::value_type;
+            std::vector<std::string> params = TypeVecToStrVec<V>(val);
+            this->SetHeaderParam(key, openapi::JoinStrings(params, ','));
+        } 
         else
         {
-            static_assert("type not supported");
+            this->SetHeaderParam(key, TypeToString(val));
         }
+
     }
 
     template <typename T>
     void SetQueryParam(std::string key, T val){
-        if constexpr (std::is_same<T, int>::value)
+        if constexpr (is_vector<T>::value)
         {
-            this->SetQueryParam(key, std::to_string(val));
+            using V = typename T::value_type;
+            std::vector<std::string> params = TypeVecToStrVec<V>(val);
+            this->SetQueryParam(key, openapi::JoinStrings(params, ','));
         }
-        else if constexpr (std::is_same<T, std::string>::value)
+        else 
         {
-            this->SetQueryParam(key, val);
-        }
-        else
-        {
-            static_assert("type not supported");
+            this->SetQueryParam(key, TypeToString(val));
         }
     }
 
     template <typename T>
     void SetPathParam(std::string key, T val){
-        if constexpr (std::is_same<T, int>::value)
+        // path cannot take vector values
+        this->SetPathParam(key, TypeToString(val));
+    }
+
+    template <typename T>
+    bool GetHeaderParam(std::string key, T & ret)
+    {
+        Header const & vals = this->GetHeaderParam();
+        if (vals.find(key) == vals.end())
         {
-            this->SetPathParam(key, std::to_string(val));
+            return false;
         }
-        else if constexpr (std::is_same<T, std::string>::value)
+
+        std::vector<std::string> const & val = vals.at(key);
+        if(val.size() == 0)
         {
-            this->SetPathParam(key, val);
+            return false;
+        }
+
+        if constexpr (is_vector<T>::value)
+        {
+            using V = typename T::value_type;
+            ret = StrVecToTypeVec<V>(val);
+            return true;
         }
         else
         {
-            static_assert("type not supported");
+            ret = StringToType<T>(val[0]);
+            return true;
         }
+    }
+
+    template <typename T>
+    bool GetQueryParam(std::string key, T & ret)
+    {
+        Values const & vals = this->GetQueryParam();
+        if (vals.find(key) == vals.end())
+        {
+            return false;
+        }
+
+        std::vector<std::string> const & val = vals.at(key);
+        if(val.size() == 0)
+        {
+            return false;
+        }
+
+        if constexpr (is_vector<T>::value)
+        {
+            using V = typename T::value_type;
+            ret = StrVecToTypeVec<V>(val);
+            return true;
+        }
+        else
+        {
+            // take the first one otherwise
+            ret = StringToType<T>(val[0]);
+            return true;
+        }
+    }
+
+    template <typename T>
+    bool GetPathParam(std::string key, T & ret)
+    {
+        std::map<std::string, std::string> const & vals = this->GetPathParam();
+        if (vals.find(key) == vals.end())
+        {
+            return false;
+        }
+        ret = StringToType<T>(vals.at(key));
+        return true;
     }
 
 protected:
@@ -111,6 +247,7 @@ public:
     std::string GetBody() const override;
     Header GetHeaderParam() const override;
     Values GetQueryParam() const override;
+    std::map<std::string, std::string> GetPathParam() const override;
     std::string GetMethod() const override;
 };
 

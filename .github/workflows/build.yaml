@@ -52,7 +52,7 @@ jobs:
     # only check memory in ubuntu
     - name: get valgrind
       if: ${{ matrix.os == 'ubuntu-latest' }}
-      run: sudo apt-get install valgrind
+      run: sudo apt-get update && sudo apt-get install valgrind
 
     - name: check test memory corruption
       if: ${{ matrix.os == 'ubuntu-latest' }}

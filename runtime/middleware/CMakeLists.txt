@@ -14,6 +14,10 @@ target_include_directories(openapi_runtime_middleware
     ${CMAKE_CURRENT_SOURCE_DIR}/include
 )
 
+target_link_libraries(openapi_runtime_middleware
+    PUBLIC openapi_runtime
+)
+
 if(OPENAPI_BuildTests)
     add_subdirectory(test)
 endif()
